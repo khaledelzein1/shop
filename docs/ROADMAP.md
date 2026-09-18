@@ -30,10 +30,16 @@ tout le projet d'un coup.
   - [ ] ⚠️ Non vérifié de bout en bout (register → login → endpoint protégé)
         faute de JDK 21 et de Docker Desktop actifs sur la machine au moment
         du test — code compilé et relu, à valider dès que possible
-- [ ] **Étape 3 — Catalogue (API)**
-  - [ ] CRUD catégories (admin) / lecture publique
-  - [ ] CRUD produits + variantes (admin)
-  - [ ] Recherche, filtres (catégorie, prix, marque, disponibilité), pagination/tri
+- [x] **Étape 3 — Catalogue (API)**
+  - [x] CRUD catégories (`/api/categories`, lecture publique, mutation ADMIN)
+  - [x] CRUD produits (`/api/admin/products`) + variantes et images
+        (sous-endpoints dédiés `/api/admin/products/{id}/variants|images`)
+  - [x] Recherche publique `/api/products` : filtres catégorie/marque/prix/
+        disponibilité/texte via `Specification`, pagination + tri (`Pageable`)
+  - [x] Données de démo (`V3__seed_catalog_demo_data.sql`) : 2 catégories,
+        2 produits avec variantes JSONB (RAM/stockage, taille/couleur) et images
+  - [ ] ⚠️ Non vérifié de bout en bout (mêmes blocages JDK 21 / Docker Desktop
+        que l'étape 2) — code compilé et relu, à valider dès que possible
 - [ ] **Étape 4 — Panier & Checkout (API)**
   - [ ] Ajout/modification/suppression d'articles panier
   - [ ] Checkout simulé → création de commande

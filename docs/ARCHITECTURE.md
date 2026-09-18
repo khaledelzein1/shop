@@ -102,7 +102,42 @@ règles par catégorie). C'est un choix pragmatique très utilisé en vrai
 e-commerce (attributs dynamiques par catégorie), qu'on assume et qu'on sait
 expliquer en entretien plutôt que de le cacher.
 
-## 6. Frontend
+## 7. API catalogue : recherche, pagination, endpoints public vs admin
+
+**Filtres dynamiques** : `ProductSpecifications` (Spring Data JPA
+`Specification`) compose les prédicats (catégorie, marque, fourchette de
+prix, disponibilité, recherche texte) uniquement pour les filtres
+réellement fournis — plus lisible et testable qu'une méthode de repository
+avec dix paramètres optionnels ou une explosion de `findByXAndYAndZ`.
+
+**Pagination + N+1** : la recherche paginée interroge `Product` sans fetch
+join (`Specification` + `Pageable` standard). Pour éviter le N+1 sur les
+collections `variants`/`images` utilisées par la vue liste (prix min/max,
+disponibilité, image principale), on s'appuie sur `@BatchSize(20)` côté
+entité plutôt que sur des fetch joins manuels : Hibernate regroupe alors le
+chargement des collections d'une page entière en une requête `IN (...)`
+au lieu d'une requête par produit.
+
+**Compromis assumé** : à l'échelle d'un catalogue de quelques milliers de
+produits, cette approche reste largement suffisante. Une vraie recherche à
+fort volume (facettes, tri par pertinence texte) passerait par un moteur
+dédié (Postgres full-text, ou Elasticsearch) — hors scope MVP.
+
+**Endpoints publics vs admin séparés pour les produits**
+(`/api/products` vs `/api/admin/products`) : contrairement aux catégories
+(simple donnée de référence, un seul contrôleur avec `@PreAuthorize` par
+méthode), les produits ont un statut actif/inactif et l'admin doit pouvoir
+lister/consulter les produits désactivés — un besoin que l'endpoint public
+n'a jamais. Séparer les chemins évite de faire fuiter de la logique
+d'autorisation dans les filtres de recherche.
+
+**Variantes et images gérées hors du payload produit** : `ProductRequest`
+ne contient ni variantes ni images — elles ont leurs propres endpoints
+(`POST /api/admin/products/{id}/variants`, `.../images`). Évite une
+logique de diff complexe (ajout/suppression/mise à jour en un seul PUT) et
+colle à un modèle REST plus simple : un sous-endpoint par sous-ressource.
+
+## 8. Frontend
 
 Angular avec architecture par feature modules (`core/`, `shared/`,
 `features/auth`, `features/catalog`, `features/cart`, `features/checkout`,

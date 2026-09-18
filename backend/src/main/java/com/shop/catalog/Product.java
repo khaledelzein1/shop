@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Table(name = "products")
@@ -42,10 +43,16 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    // @BatchSize : évite le N+1 sur les listes paginées (charge les variantes/
+    // images de plusieurs produits en une requête IN(...) groupée plutôt qu'une
+    // requête par produit). Suffisant à l'échelle MVP ; une projection agrégée
+    // dédiée serait l'étape suivante si le volume le justifiait un jour.
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 20)
     private List<ProductVariant> variants = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("position ASC")
+    @BatchSize(size = 20)
     private List<ProductImage> images = new ArrayList<>();
 }
