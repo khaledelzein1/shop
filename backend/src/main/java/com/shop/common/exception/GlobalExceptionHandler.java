@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -67,6 +68,20 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ApiError> handleAuthentication(
       AuthenticationException ex, HttpServletRequest request) {
     return build(HttpStatus.UNAUTHORIZED, "Authentification échouée", request, null);
+  }
+
+  /**
+   * Deux checkouts concurrents sur la même variante (verrou optimiste @Version côté {@code
+   * ProductVariant}) — 409 plutôt qu'un 500 générique, avec un message qui invite à réessayer.
+   */
+  @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+  public ResponseEntity<ApiError> handleOptimisticLocking(
+      ObjectOptimisticLockingFailureException ex, HttpServletRequest request) {
+    return build(
+        HttpStatus.CONFLICT,
+        "Cette ressource a été modifiée entre-temps (ex. stock changé par une autre commande) — réessayez",
+        request,
+        null);
   }
 
   @ExceptionHandler(AccessDeniedException.class)

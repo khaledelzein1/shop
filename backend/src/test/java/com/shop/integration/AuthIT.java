@@ -86,7 +86,51 @@ class AuthIT extends AbstractIntegrationTest {
   }
 
   @Test
-  void adminEndpoint_withoutAuth_isForbidden() throws Exception {
-    mockMvc.perform(get("/api/admin/orders")).andExpect(status().isForbidden());
+  void adminEndpoint_withoutAuth_isUnauthorized() throws Exception {
+    // Pas de token du tout / token invalide -> 401 (pas 403, réservé aux rôles insuffisants) :
+    // voir RestAuthenticationEntryPoint.
+    mockMvc.perform(get("/api/admin/orders")).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void refreshThenReuseOldToken_secondUseIsRejected() throws Exception {
+    String email = "refresh.rotation@example.com";
+    String registerBody =
+        objectMapper.writeValueAsString(
+            Map.of(
+                "email",
+                email,
+                "password",
+                "password123",
+                "firstName",
+                "Refresh",
+                "lastName",
+                "Rotation"));
+
+    String responseBody =
+        mockMvc
+            .perform(
+                post("/api/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(registerBody))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    String refreshToken = objectMapper.readTree(responseBody).get("refreshToken").asText();
+    String refreshBody = objectMapper.writeValueAsString(Map.of("refreshToken", refreshToken));
+
+    mockMvc
+        .perform(
+            post("/api/auth/refresh").contentType(MediaType.APPLICATION_JSON).content(refreshBody))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.refreshToken").exists());
+
+    // Rotation : le token déjà consommé ne peut pas être rejoué.
+    mockMvc
+        .perform(
+            post("/api/auth/refresh").contentType(MediaType.APPLICATION_JSON).content(refreshBody))
+        .andExpect(status().isUnauthorized());
   }
 }

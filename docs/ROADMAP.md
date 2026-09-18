@@ -187,10 +187,44 @@ tout le projet d'un coup.
         endpoints les plus significatifs (register/login, recherche et
         détail produit, checkout, changement de statut commande) —
         vérifié en observant `/v3/api-docs` après rechargement à chaud
-- [ ] **Étape 10 — Polish production-ready**
-  - [ ] Rate limiting, cache, refresh token rotation
-  - [ ] Amélioration pagination/recherche (ex. full-text search)
-  - [ ] Revue sécurité finale
+- [x] **Étape 10 — Polish production-ready**
+  - [x] Rate limiting : fenêtre fixe en mémoire par IP sur `/api/auth/login`
+        et `/api/auth/register` (5 req/min par défaut, configurable) — 429
+        au-delà, compromis assumé (mono-instance, pas de backend partagé
+        type Redis) documenté dans `RateLimitFilter`
+  - [x] Cache : Caffeine sur la liste des catégories (TTL 10 min, évincé à
+        chaque création/modification/suppression)
+  - [x] Refresh token JWT avec rotation : access token raccourci à 15 min
+        (`RefreshToken` opaque 256 bits, stocké hashé SHA-256, 7 jours,
+        `POST /api/auth/refresh` et `/logout`) ; frontend : refresh
+        automatique et transparent sur 401 avec déduplication des refresh
+        concurrents (`shareReplay`), retry de la requête initiale
+  - [x] Recherche full-text Postgres (`to_tsvector`/`websearch_to_tsquery`,
+        index GIN) sur nom/marque/description, triée par pertinence,
+        composable avec les autres filtres (catégorie/prix/stock) via une
+        requête native dédiée — le filtrage sans texte libre continue
+        d'utiliser les `Specification` existantes (pas de régression, pas
+        de sur-ingénierie pour le cas majoritaire)
+  - [x] Revue sécurité : verrouillage optimiste (`@Version`) sur
+        `ProductVariant` + contrainte `CHECK (stock >= 0)` en base contre
+        une race condition sur deux checkouts concurrents de la même
+        variante à stock limité ; correction d'un vrai bug trouvé pendant
+        les tests (voir ci-dessous)
+  - [x] 🐛 Bug trouvé et corrigé : un token absent/invalide/expiré renvoyait
+        403 au lieu de 401 (pas d'`AuthenticationEntryPoint` configuré —
+        Spring Security utilise par défaut le même gestionnaire pour "non
+        authentifié" et "droits insuffisants" faute de config explicite).
+        Cassait la logique de refresh automatique du frontend, qui ne se
+        déclenchait que sur 401. Corrigé avec un `AuthenticationEntryPoint`
+        et un `AccessDeniedHandler` dédiés (401 vs 403 correctement
+        distingués), trouvé en testant le refresh en conditions réelles
+        avec un token corrompu plutôt qu'en supposant que ça marchait
+  - [x] ✅ Vérifié de bout en bout : rate limiting (429 après 5 tentatives),
+        rotation refresh token (ancien token rejoué → 401, logout →
+        révocation effective), recherche full-text (résultats pertinents,
+        requête vide → liste vide), contrainte CHECK stock (rejet direct
+        en base testé via psql), parcours client et admin complets
+        rejoués avec Playwright — zéro régression, zéro erreur console
 
 ## V2 (après le MVP complet)
 - [ ] Wishlist

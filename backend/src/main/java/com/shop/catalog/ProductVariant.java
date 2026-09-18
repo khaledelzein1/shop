@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,13 @@ import org.hibernate.type.SqlTypes;
 @Setter
 @NoArgsConstructor
 public class ProductVariant extends BaseEntity {
+
+  /**
+   * Verrouillage optimiste : protège la décrémentation de stock contre les checkouts concurrents.
+   */
+  @Version
+  @Column(nullable = false)
+  private Long version;
 
   @Column(nullable = false, unique = true)
   private String sku;

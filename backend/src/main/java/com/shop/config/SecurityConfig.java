@@ -2,6 +2,7 @@ package com.shop.config;
 
 import com.shop.security.config.CustomUserDetailsService;
 import com.shop.security.jwt.JwtAuthenticationFilter;
+import com.shop.security.ratelimit.RateLimitFilter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -54,13 +55,20 @@ public class SecurityConfig {
   };
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final RateLimitFilter rateLimitFilter;
   private final CustomUserDetailsService userDetailsService;
+  private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+  private final RestAccessDeniedHandler restAccessDeniedHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(
+            ex ->
+                ex.authenticationEntryPoint(restAuthenticationEntryPoint)
+                    .accessDeniedHandler(restAccessDeniedHandler))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(PUBLIC_ENDPOINTS)
@@ -73,7 +81,8 @@ public class SecurityConfig {
                     .anyRequest()
                     .authenticated())
         .authenticationProvider(authenticationProvider())
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(rateLimitFilter, JwtAuthenticationFilter.class);
     return http.build();
   }
 

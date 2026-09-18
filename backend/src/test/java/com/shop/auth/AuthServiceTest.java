@@ -11,6 +11,7 @@ import com.shop.auth.dto.RegisterRequest;
 import com.shop.common.exception.EmailAlreadyUsedException;
 import com.shop.security.jwt.JwtProperties;
 import com.shop.security.jwt.JwtService;
+import com.shop.security.jwt.RefreshTokenService;
 import com.shop.user.Role;
 import com.shop.user.RoleName;
 import com.shop.user.RoleRepository;
@@ -42,6 +43,8 @@ class AuthServiceTest {
 
   @Mock private JwtProperties jwtProperties;
 
+  @Mock private RefreshTokenService refreshTokenService;
+
   @InjectMocks private AuthService authService;
 
   @Test
@@ -71,10 +74,12 @@ class AuthServiceTest {
             });
     when(jwtProperties.getExpirationMs()).thenReturn(86_400_000L);
     when(jwtService.generateToken(any())).thenReturn("fake-jwt-token");
+    when(refreshTokenService.issue(any())).thenReturn("fake-refresh-token");
 
     AuthResponse response = authService.register(request);
 
     assertThat(response.accessToken()).isEqualTo("fake-jwt-token");
+    assertThat(response.refreshToken()).isEqualTo("fake-refresh-token");
     assertThat(response.user().email()).isEqualTo("new@example.com");
     assertThat(response.user().roles()).containsExactly("ROLE_USER");
     assertThat(response.expiresInSeconds()).isEqualTo(86_400L);

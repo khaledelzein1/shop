@@ -6,6 +6,8 @@ import com.shop.common.exception.ConflictException;
 import com.shop.common.exception.ResourceNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ public class CategoryService {
   private final CategoryRepository categoryRepository;
   private final ProductRepository productRepository;
 
+  @Cacheable("categories")
   @Transactional(readOnly = true)
   public List<CategoryResponse> list() {
     return categoryRepository.findAll(Sort.by(Sort.Direction.ASC, "name")).stream()
@@ -29,6 +32,7 @@ public class CategoryService {
     return CategoryResponse.from(findBySlugOrThrow(slug));
   }
 
+  @CacheEvict(value = "categories", allEntries = true)
   @Transactional
   public CategoryResponse create(CategoryRequest request) {
     if (categoryRepository.existsBySlug(request.slug())) {
@@ -39,6 +43,7 @@ public class CategoryService {
     return CategoryResponse.from(categoryRepository.save(category));
   }
 
+  @CacheEvict(value = "categories", allEntries = true)
   @Transactional
   public CategoryResponse update(Long id, CategoryRequest request) {
     Category category = findByIdOrThrow(id);
@@ -50,6 +55,7 @@ public class CategoryService {
     return CategoryResponse.from(category);
   }
 
+  @CacheEvict(value = "categories", allEntries = true)
   @Transactional
   public void delete(Long id) {
     Category category = findByIdOrThrow(id);

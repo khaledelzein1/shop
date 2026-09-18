@@ -7,6 +7,7 @@ import com.shop.common.exception.EmailAlreadyUsedException;
 import com.shop.security.config.UserPrincipal;
 import com.shop.security.jwt.JwtProperties;
 import com.shop.security.jwt.JwtService;
+import com.shop.security.jwt.RefreshTokenService;
 import com.shop.user.Role;
 import com.shop.user.RoleName;
 import com.shop.user.RoleRepository;
@@ -31,6 +32,7 @@ public class AuthService {
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
   private final JwtProperties jwtProperties;
+  private final RefreshTokenService refreshTokenService;
 
   @Transactional
   public AuthResponse register(RegisterRequest request) {
@@ -57,6 +59,7 @@ public class AuthService {
     return buildAuthResponse(user);
   }
 
+  @Transactional
   public AuthResponse login(LoginRequest request) {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(request.email(), request.password()));
@@ -70,9 +73,29 @@ public class AuthService {
     return buildAuthResponse(user);
   }
 
+  /**
+   * Rotation : le refresh token fourni est révoqué et remplacé par un nouveau couple
+   * access/refresh.
+   */
+  @Transactional
+  public AuthResponse refresh(String rawRefreshToken) {
+    User user = refreshTokenService.consume(rawRefreshToken);
+    return buildAuthResponse(user);
+  }
+
+  @Transactional
+  public void logout(String rawRefreshToken) {
+    refreshTokenService.revoke(rawRefreshToken);
+  }
+
   private AuthResponse buildAuthResponse(User user) {
-    String token = jwtService.generateToken(new UserPrincipal(user));
+    String accessToken = jwtService.generateToken(new UserPrincipal(user));
+    String refreshToken = refreshTokenService.issue(user);
     return new AuthResponse(
-        token, "Bearer", jwtProperties.getExpirationMs() / 1000, UserResponse.from(user));
+        accessToken,
+        refreshToken,
+        "Bearer",
+        jwtProperties.getExpirationMs() / 1000,
+        UserResponse.from(user));
   }
 }

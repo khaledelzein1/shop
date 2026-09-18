@@ -10,6 +10,7 @@ import com.shop.common.exception.ConflictException;
 import com.shop.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,7 @@ public class ProductService {
   @Transactional(readOnly = true)
   public PageResponse<ProductSummaryResponse> searchPublic(
       ProductFilter filter, Pageable pageable) {
-    Specification<Product> spec = buildSpecification(filter, true);
-    Page<Product> page = productRepository.findAll(spec, pageable);
-    return PageResponse.from(page.map(ProductSummaryResponse::from));
+    return search(filter, true, pageable);
   }
 
   @Transactional(readOnly = true)
@@ -44,7 +43,33 @@ public class ProductService {
   /** Listing admin : tous les produits (actifs et inactifs). */
   @Transactional(readOnly = true)
   public PageResponse<ProductSummaryResponse> searchAdmin(ProductFilter filter, Pageable pageable) {
-    Specification<Product> spec = buildSpecification(filter, null);
+    return search(filter, null, pageable);
+  }
+
+  /**
+   * Recherche texte (Postgres full-text, cf. {@link ProductRepository#searchFullText}) quand {@code
+   * q} est fourni ; sinon filtres composables classiques ({@link Specification}) — évite de payer
+   * le coût (et la complexité) d'une requête native quand personne ne tape de recherche texte, cas
+   * très majoritaire du trafic catalogue.
+   */
+  private PageResponse<ProductSummaryResponse> search(
+      ProductFilter filter, Boolean forceActive, Pageable pageable) {
+    if (filter.q() != null && !filter.q().isBlank()) {
+      Pageable unsorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+      Page<Product> page =
+          productRepository.searchFullText(
+              forceActive,
+              filter.category(),
+              filter.brand(),
+              filter.minPrice(),
+              filter.maxPrice(),
+              filter.inStock(),
+              filter.q(),
+              unsorted);
+      return PageResponse.from(page.map(ProductSummaryResponse::from));
+    }
+
+    Specification<Product> spec = buildSpecification(filter, forceActive);
     Page<Product> page = productRepository.findAll(spec, pageable);
     return PageResponse.from(page.map(ProductSummaryResponse::from));
   }

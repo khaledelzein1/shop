@@ -36,7 +36,11 @@ app:
     # ⚠️ valeur par défaut pour le dev local uniquement — à surcharger via
     # la variable d'env JWT_SECRET dans tout environnement partagé/déployé.
     secret: ${JWT_SECRET:local-dev-only-change-me-32-bytes-minimum-secret-key}
-    expiration-ms: ${JWT_EXPIRATION_MS:86400000} # 24h — pas de refresh token en MVP (voir ROADMAP étape 10)
+    expiration-ms: ${JWT_EXPIRATION_MS:900000} # 15 min — court car un refresh token existe (rotation, étape 10)
+    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000} # 7 jours, token opaque stocké hashé en base
+  rate-limit:
+    max-requests: ${RATE_LIMIT_MAX_REQUESTS:5}
+    window-ms: ${RATE_LIMIT_WINDOW_MS:60000} # 5 tentatives / minute / IP sur /api/auth/login et /register
   seed:
     admin:
       enabled: ${SEED_ADMIN_ENABLED:true}
