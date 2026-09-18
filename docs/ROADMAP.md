@@ -139,7 +139,7 @@ tout le projet d'un coup.
   - [x] ✅ Vérifié : health/info accessibles sans auth, metrics/prometheus
         bloqués sans token (403) puis accessibles en ADMIN, header
         `X-Request-Id` bien renvoyé sur chaque réponse
-- [ ] **Étape 9 — Qualité** (tests faits, lint et doc OpenAPI restants)
+- [x] **Étape 9 — Qualité**
   - [x] Tests unitaires backend (JUnit 5 + Mockito) : `AuthServiceTest`,
         `CartServiceTest`, `OrderServiceTest` — logique métier clé (hash de
         mot de passe + rôle à l'inscription, refus de stock insuffisant,
@@ -175,9 +175,18 @@ tout le projet d'un coup.
         empiriquement** faute de remote GitHub configuré sur ce repo. À
         confirmer dès qu'un remote existe et qu'un premier push déclenche
         la CI.
-  - [ ] Lint (Checkstyle/Spotless backend, ESLint frontend)
-  - [ ] Documentation OpenAPI/Swagger (au-delà de l'exposition Swagger UI
-        déjà en place depuis l'étape 2 — descriptions/exemples détaillés)
+  - [x] Lint : Spotless (Google Java Format) côté backend, branché sur la
+        phase `validate` (bloque `mvn compile`/`test`/`verify` si le code
+        n'est pas formaté) ; ESLint (`@angular-eslint`) côté frontend, CI
+        mise à jour (`ng lint`) — migration de toute l'injection de
+        dépendances vers `inject()` via le codemod officiel Angular, seule
+        règle que le lint remontait initialement
+  - [x] Documentation OpenAPI : `@Tag` sur les 11 contrôleurs (groupement
+        clair dans Swagger UI : Auth, Catalogue, Panier, Commandes,
+        Adresses, Admin - *) + `@Operation` summary/description sur les
+        endpoints les plus significatifs (register/login, recherche et
+        détail produit, checkout, changement de statut commande) —
+        vérifié en observant `/v3/api-docs` après rechargement à chaud
 - [ ] **Étape 10 — Polish production-ready**
   - [ ] Rate limiting, cache, refresh token rotation
   - [ ] Amélioration pagination/recherche (ex. full-text search)

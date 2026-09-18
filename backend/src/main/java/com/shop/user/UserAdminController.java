@@ -4,6 +4,7 @@ import com.shop.common.dto.PageResponse;
 import com.shop.security.config.UserPrincipal;
 import com.shop.user.dto.AdminUserResponse;
 import com.shop.user.dto.UpdateUserStatusRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/users")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
+@Tag(
+    name = "Admin - Utilisateurs",
+    description = "Recherche et activation/désactivation des comptes (ADMIN)")
 public class UserAdminController {
 
   private final UserAdminService userAdminService;

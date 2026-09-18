@@ -4,6 +4,8 @@ import com.shop.common.dto.PageResponse;
 import com.shop.order.dto.AdminOrderSummaryResponse;
 import com.shop.order.dto.OrderResponse;
 import com.shop.order.dto.UpdateOrderStatusRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/orders")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
+@Tag(
+    name = "Admin - Commandes",
+    description = "Suivi et changement de statut des commandes (ADMIN)")
 public class OrderAdminController {
 
   private final OrderService orderService;
@@ -41,6 +46,11 @@ public class OrderAdminController {
   }
 
   @PatchMapping("/{id}/status")
+  @Operation(
+      summary = "Changer le statut d'une commande",
+      description =
+          "Transitions limitées à une machine à états (ex. impossible de repasser SHIPPED "
+              + "en PENDING) — 409 sinon. Annuler restitue le stock des variantes.")
   public OrderResponse updateStatus(
       @PathVariable Long id, @Valid @RequestBody UpdateOrderStatusRequest request) {
     return orderService.updateStatus(id, request.status());

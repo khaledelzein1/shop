@@ -5,6 +5,7 @@ import com.shop.catalog.dto.ProductRequest;
 import com.shop.catalog.dto.ProductResponse;
 import com.shop.catalog.dto.ProductSummaryResponse;
 import com.shop.common.dto.PageResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admin/products")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin - Produits", description = "CRUD produits (ADMIN)")
 @RequiredArgsConstructor
 public class ProductAdminController {
 

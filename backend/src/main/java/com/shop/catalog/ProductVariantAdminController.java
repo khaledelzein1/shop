@@ -3,6 +3,7 @@ package com.shop.catalog;
 import com.shop.catalog.dto.ProductVariantRequest;
 import com.shop.catalog.dto.ProductVariantResponse;
 import com.shop.catalog.dto.UpdateStockRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
+@Tag(name = "Admin - Produits", description = "CRUD produits (ADMIN)")
 public class ProductVariantAdminController {
 
   private final ProductVariantService productVariantService;

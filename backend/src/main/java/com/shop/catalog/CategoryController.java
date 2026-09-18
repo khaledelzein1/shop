@@ -2,6 +2,7 @@ package com.shop.catalog;
 
 import com.shop.catalog.dto.CategoryRequest;
 import com.shop.catalog.dto.CategoryResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
+@Tag(name = "Catalogue - Catégories", description = "Lecture publique, écriture ADMIN")
 public class CategoryController {
 
   private final CategoryService categoryService;

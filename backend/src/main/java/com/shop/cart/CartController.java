@@ -4,6 +4,7 @@ import com.shop.cart.dto.AddCartItemRequest;
 import com.shop.cart.dto.CartResponse;
 import com.shop.cart.dto.UpdateCartItemRequest;
 import com.shop.security.config.UserPrincipal;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/me/cart")
 @RequiredArgsConstructor
+@Tag(name = "Panier", description = "Panier de l'utilisateur connecté")
 public class CartController {
 
   private final CartService cartService;

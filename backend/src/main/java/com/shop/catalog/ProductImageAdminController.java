@@ -2,6 +2,7 @@ package com.shop.catalog;
 
 import com.shop.catalog.dto.ProductImageRequest;
 import com.shop.catalog.dto.ProductImageResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
+@Tag(name = "Admin - Produits", description = "CRUD produits (ADMIN)")
 public class ProductImageAdminController {
 
   private final ProductImageService productImageService;

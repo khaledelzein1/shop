@@ -3,6 +3,7 @@ package com.shop.address;
 import com.shop.address.dto.AddressRequest;
 import com.shop.address.dto.AddressResponse;
 import com.shop.security.config.UserPrincipal;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/me/addresses")
 @RequiredArgsConstructor
+@Tag(name = "Adresses", description = "Carnet d'adresses de l'utilisateur connecté")
 public class AddressController {
 
   private final AddressService addressService;
