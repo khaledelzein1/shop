@@ -9,13 +9,18 @@ import com.shop.catalog.ProductVariant;
 import com.shop.common.dto.PageResponse;
 import com.shop.common.exception.ConflictException;
 import com.shop.common.exception.ResourceNotFoundException;
+import com.shop.order.dto.AdminOrderSummaryResponse;
 import com.shop.order.dto.CheckoutRequest;
 import com.shop.order.dto.OrderResponse;
 import com.shop.order.dto.OrderSummaryResponse;
+import com.shop.order.spec.OrderSpecifications;
 import com.shop.user.UserRepository;
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +33,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
+
+    /**
+     * Transitions de statut autorisées — évite qu'un admin puisse renvoyer
+     * une commande livrée à "en attente" ou d'autres changements incohérents.
+     * DELIVERED et CANCELLED sont des états terminaux.
+     */
+    private static final Map<OrderStatus, Set<OrderStatus>> ALLOWED_TRANSITIONS = Map.of(
+            OrderStatus.PENDING, Set.of(OrderStatus.CONFIRMED, OrderStatus.CANCELLED),
+            OrderStatus.CONFIRMED, Set.of(OrderStatus.SHIPPED, OrderStatus.CANCELLED),
+            OrderStatus.SHIPPED, Set.of(OrderStatus.DELIVERED),
+            OrderStatus.DELIVERED, Set.of(),
+            OrderStatus.CANCELLED, Set.of());
 
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
@@ -94,5 +111,49 @@ public class OrderService {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Commande introuvable (id=" + orderId + ")"));
         return OrderResponse.from(order);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AdminOrderSummaryResponse> searchAdmin(OrderStatus status, Long userId, Pageable pageable) {
+        Specification<Order> spec = Specification.where(OrderSpecifications.hasStatus(status))
+                .and(OrderSpecifications.hasUserId(userId));
+        return PageResponse.from(orderRepository.findAll(spec, pageable).map(AdminOrderSummaryResponse::from));
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getByIdForAdmin(Long orderId) {
+        Order order = findByIdOrThrow(orderId);
+        return OrderResponse.from(order);
+    }
+
+    /** Le repassage à CANCELLED restitue le stock des variantes concernées. */
+    @Transactional
+    public OrderResponse updateStatus(Long orderId, OrderStatus newStatus) {
+        Order order = findByIdOrThrow(orderId);
+        if (order.getStatus() == newStatus) {
+            return OrderResponse.from(order);
+        }
+        Set<OrderStatus> allowed = ALLOWED_TRANSITIONS.getOrDefault(order.getStatus(), Set.of());
+        if (!allowed.contains(newStatus)) {
+            throw new ConflictException(
+                    "Transition de statut invalide : " + order.getStatus() + " -> " + newStatus);
+        }
+
+        if (newStatus == OrderStatus.CANCELLED) {
+            for (OrderItem item : order.getItems()) {
+                ProductVariant variant = item.getVariant();
+                if (variant != null) {
+                    variant.setStock(variant.getStock() + item.getQuantity());
+                }
+            }
+        }
+
+        order.setStatus(newStatus);
+        return OrderResponse.from(order);
+    }
+
+    private Order findByIdOrThrow(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Commande introuvable (id=" + orderId + ")"));
     }
 }

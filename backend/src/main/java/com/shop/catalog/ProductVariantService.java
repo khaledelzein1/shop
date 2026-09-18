@@ -2,6 +2,7 @@ package com.shop.catalog;
 
 import com.shop.catalog.dto.ProductVariantRequest;
 import com.shop.catalog.dto.ProductVariantResponse;
+import com.shop.catalog.dto.UpdateStockRequest;
 import com.shop.common.exception.ConflictException;
 import com.shop.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,14 @@ public class ProductVariantService {
             throw new ConflictException("Une variante existe déjà avec le SKU : " + request.sku());
         }
         applyRequest(variant, request);
+        return ProductVariantResponse.from(variant);
+    }
+
+    /** Mise à jour dédiée au stock — pratique pour un écran admin qui ne gère que ça. */
+    @Transactional
+    public ProductVariantResponse updateStock(Long productId, Long variantId, UpdateStockRequest request) {
+        ProductVariant variant = findByIdAndProductOrThrow(variantId, productId);
+        variant.setStock(request.stock());
         return ProductVariantResponse.from(variant);
     }
 

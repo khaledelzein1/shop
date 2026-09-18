@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -45,6 +47,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
         return build(HttpStatus.UNAUTHORIZED, "Email ou mot de passe incorrect", request, null);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ApiError> handleDisabled(DisabledException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNAUTHORIZED, "Ce compte est désactivé", request, null);
+    }
+
+    /** Filet de sécurité pour les autres AuthenticationException (locked, expired...) non gérées explicitement. */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiError> handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNAUTHORIZED, "Authentification échouée", request, null);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

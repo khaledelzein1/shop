@@ -58,10 +58,23 @@ tout le projet d'un coup.
         409 si stock insuffisant, checkout → commande `CONFIRMED`, stock
         variante décrémenté (15→13 vérifié), panier vidé après commande,
         historique correct
-- [ ] **Étape 5 — Admin (API)**
-  - [ ] Gestion commandes (changement de statut)
-  - [ ] Gestion utilisateurs
-  - [ ] Gestion stock
+- [x] **Étape 5 — Admin (API)**
+  - [x] Gestion commandes (`/api/admin/orders`) : liste filtrable (statut,
+        utilisateur) paginée, détail, `PATCH .../status` avec machine à
+        états simple (transitions autorisées uniquement, ex. impossible de
+        repasser `SHIPPED` en `PENDING`) — annuler restitue le stock
+  - [x] Gestion utilisateurs (`/api/admin/users`) : liste filtrable par
+        email, détail, activation/désactivation — un admin ne peut pas se
+        désactiver lui-même (409)
+  - [x] Gestion stock : `PATCH /api/admin/products/{id}/variants/{id}/stock`
+        dédié, en plus du `PUT` variante complet
+  - [x] Fix sécurité complémentaire : un compte désactivé perd l'accès
+        immédiatement même avec un JWT déjà émis (vérification `isEnabled()`
+        à chaque requête dans `JwtAuthenticationFilter`, pas seulement au login)
+  - [x] ✅ Vérifié de bout en bout — a révélé un 2e bug corrigé dans la
+        foulée : la désactivation d'un compte pendant la tentative de login
+        suivante renvoyait 500 (`DisabledException` non gérée par
+        `GlobalExceptionHandler`) au lieu d'un 401 propre. Corrigé.
 - [ ] **Étape 6 — Frontend Angular**
   - [ ] Squelette (routing, core/shared/features, intercepteur JWT)
   - [ ] Auth (login/register)
