@@ -75,7 +75,7 @@ tout le projet d'un coup.
         foulée : la désactivation d'un compte pendant la tentative de login
         suivante renvoyait 500 (`DisabledException` non gérée par
         `GlobalExceptionHandler`) au lieu d'un 401 propre. Corrigé.
-- [ ] **Étape 6 — Frontend Angular** (parcours client fait, espace admin restant)
+- [x] **Étape 6 — Frontend Angular**
   - [x] Squelette Angular 22 standalone (`core/`, `shared/`, `features/`),
         intercepteurs JWT + gestion 401, guards `authGuard`/`adminGuard`
   - [x] Auth (login/register), état utilisateur réactif via signals
@@ -90,8 +90,18 @@ tout le projet d'un coup.
         panier → panier → ajout adresse → checkout → confirmation →
         historique. Zéro erreur console sur tout le parcours. Captures
         d'écran validées visuellement.
-  - [ ] Espace admin (dashboard, gestion produits/catégories/variantes/
-        stock, commandes, utilisateurs) — reste à construire
+  - [x] Espace admin (`/admin`, guard `adminGuard`) : dashboard, CRUD
+        catégories, CRUD produits avec gestion variantes (ajout, stock
+        inline, suppression) et images, gestion des commandes (changement
+        de statut par menu déroulant), gestion des utilisateurs
+        (recherche, activation/désactivation)
+  - [x] ✅ Vérifié de bout en bout avec Playwright headless (connexion admin,
+        création catégorie/produit, ajout variante + image, mise à jour du
+        stock en ligne, changement de statut de commande) — zéro erreur
+        console
+  - [x] Petit ajustement backend en cours de route : ajout du champ
+        `active` à `ProductSummaryResponse` (absent jusque-là), nécessaire
+        pour que la liste admin distingue produits actifs/inactifs
 - [ ] **Étape 7 — DevOps**
   - [ ] Dockerfile backend, Dockerfile frontend
   - [ ] docker-compose (app + Postgres)

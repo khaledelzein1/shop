@@ -4,3 +4,9 @@ export interface Category {
   slug: string;
   description: string | null;
 }
+
+export interface CategoryRequest {
+  name: string;
+  slug: string;
+  description: string;
+}

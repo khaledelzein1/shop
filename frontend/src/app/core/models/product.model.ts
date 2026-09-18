@@ -9,6 +9,7 @@ export interface ProductSummary {
   minPrice: number | null;
   maxPrice: number | null;
   inStock: boolean;
+  active: boolean;
   primaryImageUrl: string | null;
 }
 
@@ -47,4 +48,31 @@ export interface ProductFilter {
   maxPrice?: number;
   inStock?: boolean;
   q?: string;
+}
+
+export interface ProductRequest {
+  name: string;
+  slug: string;
+  description: string;
+  brand: string;
+  active: boolean;
+  categoryId: number;
+}
+
+export interface ProductVariantRequest {
+  sku: string;
+  price: number;
+  stock: number;
+  active: boolean;
+  attributes: Record<string, string>;
+}
+
+export interface ProductImageRequest {
+  url: string;
+  position: number;
+  primary: boolean;
+}
+
+export interface UpdateStockRequest {
+  stock: number;
 }

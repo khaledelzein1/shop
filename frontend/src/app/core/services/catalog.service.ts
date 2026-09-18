@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Category } from '../models/category.model';
+import { Category, CategoryRequest } from '../models/category.model';
 import { PageResponse } from '../models/page.model';
 import { Product, ProductFilter, ProductSummary } from '../models/product.model';
 
@@ -12,6 +12,18 @@ export class CatalogService {
 
   listCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${environment.apiUrl}/categories`);
+  }
+
+  createCategory(payload: CategoryRequest): Observable<Category> {
+    return this.http.post<Category>(`${environment.apiUrl}/categories`, payload);
+  }
+
+  updateCategory(id: number, payload: CategoryRequest): Observable<Category> {
+    return this.http.put<Category>(`${environment.apiUrl}/categories/${id}`, payload);
+  }
+
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/categories/${id}`);
   }
 
   searchProducts(filter: ProductFilter, page: number, size: number): Observable<PageResponse<ProductSummary>> {

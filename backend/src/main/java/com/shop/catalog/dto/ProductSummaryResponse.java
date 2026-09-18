@@ -15,6 +15,7 @@ public record ProductSummaryResponse(
         BigDecimal minPrice,
         BigDecimal maxPrice,
         boolean inStock,
+        boolean active,
         String primaryImageUrl) {
 
     public static ProductSummaryResponse from(Product product) {
@@ -44,6 +45,7 @@ public record ProductSummaryResponse(
                 minPrice,
                 maxPrice,
                 inStock,
+                product.isActive(),
                 primaryImageUrl);
     }
 }

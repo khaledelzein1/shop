@@ -1,0 +1,54 @@
+<h1>Commandes</h1>
+
+<div class="filters-bar">
+  <div class="form-field">
+    <label for="status">Statut</label>
+    <select id="status" [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+      <option value="">Tous</option>
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ s }}</option>
+      }
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <p>Chargement...</p>
+} @else if (orders().length === 0) {
+  <p>Aucune commande.</p>
+} @else {
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Commande</th>
+        <th>Client</th>
+        <th>Date</th>
+        <th>Articles</th>
+        <th>Total</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (order of orders(); track order.id) {
+        <tr>
+          <td>#{{ order.id }}</td>
+          <td>{{ order.userEmail }}</td>
+          <td>{{ order.createdAt | date: "dd/MM/yyyy" }}</td>
+          <td>{{ order.itemCount }}</td>
+          <td>{{ order.totalAmount | number: "1.2-2" }} €</td>
+          <td>
+            <select
+              [ngModel]="order.status"
+              (ngModelChange)="changeStatus(order.id, $event)"
+              [class]="'status-pill ' + order.status"
+            >
+              @for (s of statuses; track s) {
+                <option [value]="s">{{ s }}</option>
+              }
+            </select>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

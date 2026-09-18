@@ -33,3 +33,7 @@ export interface OrderSummary {
   createdAt: string;
   itemCount: number;
 }
+
+export interface AdminOrderSummary extends OrderSummary {
+  userEmail: string;
+}
