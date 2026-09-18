@@ -25,11 +25,36 @@ shop/
 └── docker/     # docker-compose, fichiers d'infra locale
 ```
 
+## Démarrage rapide
+
+Prérequis : **JDK 21** (exactement — voir `docs/ARCHITECTURE.md` §0),
+**Node 22+**, Docker Desktop.
+
+```bash
+# 1. Base de données locale
+cd docker && docker compose up -d
+
+# 2. Backend (terminal séparé)
+cd backend && mvn spring-boot:run
+
+# 3. Frontend (terminal séparé)
+cd frontend && npm install && npx ng serve
+```
+
+- API : http://localhost:8080 (Swagger UI : `/swagger-ui.html`)
+- Frontend : http://localhost:4200
+- Compte admin de démo créé automatiquement : `admin@shop.local` /
+  `ChangeMe123!` (dev uniquement — voir `SEED_ADMIN_ENABLED`)
+
+Pour tester la pile complète conteneurisée (proche prod), voir
+[docker/README.md](docker/README.md).
+
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md) — décisions techniques et découpage backend
 - [Modèle de domaine](docs/DOMAIN_MODEL.md) — entités, relations, MVP vs V2
 - [Roadmap](docs/ROADMAP.md) — étapes de construction du projet
+- [docker/README.md](docker/README.md) — dev vs pile complète conteneurisée
 
 ## État du projet
 

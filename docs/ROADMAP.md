@@ -102,11 +102,30 @@ tout le projet d'un coup.
   - [x] Petit ajustement backend en cours de route : ajout du champ
         `active` à `ProductSummaryResponse` (absent jusque-là), nécessaire
         pour que la liste admin distingue produits actifs/inactifs
-- [ ] **Étape 7 — DevOps**
-  - [ ] Dockerfile backend, Dockerfile frontend
-  - [ ] docker-compose (app + Postgres)
-  - [ ] CI GitHub Actions (build, tests, lint)
-  - [ ] Déploiement cloud (à définir : Render/Railway/Fly.io pour un portfolio gratuit)
+- [x] **Étape 7 — DevOps** (déploiement cloud reporté, reste de l'étape faite)
+  - [x] `backend/Dockerfile` (multi-stage Maven → JRE Alpine, utilisateur
+        non-root) et `frontend/Dockerfile` (multi-stage build Angular →
+        nginx Alpine)
+  - [x] `docker-compose.yml` (dev, Postgres seul) + `docker-compose.prod.yml`
+        (pile complète Postgres + backend + frontend/nginx avec reverse
+        proxy `/api`) — voir `docker/README.md`
+  - [x] CI GitHub Actions (`.github/workflows/ci.yml`) : build+tests backend
+        (JDK 21), build frontend (Node 24), build des deux images Docker
+  - [x] ✅ Vérifié de bout en bout : les deux images buildent, la pile
+        complète tourne (`docker compose -f docker-compose.prod.yml up`),
+        parcours client entier rejoué avec Playwright contre le build de
+        prod servi par nginx — zéro erreur console
+  - [x] 🐛 Bug DevOps trouvé et corrigé pendant la validation : les deux
+        fichiers compose partageant le même dossier, ils héritaient du même
+        nom de projet Docker par défaut et donc du **même volume Postgres
+        nommé** (`pgdata`) — le second à démarrer réutilisait les données
+        (et donc l'ancien mot de passe) du premier, causant un échec
+        d'authentification. Corrigé en donnant un `name:` de projet
+        explicite et distinct à chaque fichier compose (`shop-dev` /
+        `shop-prod`), qui isole aussi les volumes.
+  - [ ] Déploiement cloud (Render/Railway/Fly.io) — reporté : nécessite un
+        compte/service externe, décision à prendre avec l'utilisateur avant
+        de continuer
 - [ ] **Étape 8 — Observabilité**
   - [ ] Spring Actuator (health, info)
   - [ ] Logs structurés

@@ -1,0 +1,65 @@
+# Pile complète (Postgres + backend + frontend), pour tester en local un
+# environnement proche de la prod, et comme base pour le déploiement cloud.
+# Pour le développement au quotidien (hot-reload), utiliser docker-compose.yml
+# (Postgres seul) + `mvn spring-boot:run` + `ng serve` à la place.
+#
+# `name:` explicite ci-dessous : sans ça, docker compose dérive le nom de
+# projet du dossier courant, et comme docker-compose.yml (Postgres seul,
+# mot de passe "shop") partage ce même dossier, les deux fichiers finiraient
+# par se disputer le même volume nommé "pgdata" — le second à démarrer
+# hériterait du mot de passe Postgres du premier (Postgres ne réapplique
+# POSTGRES_PASSWORD qu'à l'initialisation d'un volume vide), causant un
+# échec d'authentification. Un nom de projet dédié isole complètement le
+# réseau et les volumes des deux piles.
+name: shop-prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shop-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: shop
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-shop}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shop -d shop"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: shop-backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/shop
+      DB_USERNAME: shop
+      DB_PASSWORD: ${DB_PASSWORD:-shop}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET est requis (32 caractères minimum) — voir .env.example}
+      SEED_ADMIN_ENABLED: ${SEED_ADMIN_ENABLED:-false}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@shop.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: shop-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+
+volumes:
+  pgdata:
