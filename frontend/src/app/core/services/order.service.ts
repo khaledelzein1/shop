@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Order, OrderSummary } from '../models/order.model';
@@ -7,7 +7,7 @@ import { PageResponse } from '../models/page.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
-  constructor(private readonly http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   checkout(addressId: number): Observable<Order> {
     return this.http.post<Order>(`${environment.apiUrl}/me/orders/checkout`, { addressId });

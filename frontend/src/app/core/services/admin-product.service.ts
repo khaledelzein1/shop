@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PageResponse } from '../models/page.model';
@@ -17,15 +17,21 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class AdminProductService {
-  constructor(private readonly http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
-  search(filter: ProductFilter, page: number, size: number): Observable<PageResponse<ProductSummary>> {
+  search(
+    filter: ProductFilter,
+    page: number,
+    size: number,
+  ): Observable<PageResponse<ProductSummary>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (filter.category) params = params.set('category', filter.category);
     if (filter.brand) params = params.set('brand', filter.brand);
     if (filter.q) params = params.set('q', filter.q);
 
-    return this.http.get<PageResponse<ProductSummary>>(`${environment.apiUrl}/admin/products`, { params });
+    return this.http.get<PageResponse<ProductSummary>>(`${environment.apiUrl}/admin/products`, {
+      params,
+    });
   }
 
   getById(id: number): Observable<Product> {
@@ -45,17 +51,28 @@ export class AdminProductService {
   }
 
   addVariant(productId: number, payload: ProductVariantRequest): Observable<ProductVariant> {
-    return this.http.post<ProductVariant>(`${environment.apiUrl}/admin/products/${productId}/variants`, payload);
+    return this.http.post<ProductVariant>(
+      `${environment.apiUrl}/admin/products/${productId}/variants`,
+      payload,
+    );
   }
 
-  updateVariant(productId: number, variantId: number, payload: ProductVariantRequest): Observable<ProductVariant> {
+  updateVariant(
+    productId: number,
+    variantId: number,
+    payload: ProductVariantRequest,
+  ): Observable<ProductVariant> {
     return this.http.put<ProductVariant>(
       `${environment.apiUrl}/admin/products/${productId}/variants/${variantId}`,
       payload,
     );
   }
 
-  updateVariantStock(productId: number, variantId: number, payload: UpdateStockRequest): Observable<ProductVariant> {
+  updateVariantStock(
+    productId: number,
+    variantId: number,
+    payload: UpdateStockRequest,
+  ): Observable<ProductVariant> {
     return this.http.patch<ProductVariant>(
       `${environment.apiUrl}/admin/products/${productId}/variants/${variantId}/stock`,
       payload,
@@ -63,14 +80,21 @@ export class AdminProductService {
   }
 
   deleteVariant(productId: number, variantId: number): Observable<void> {
-    return this.http.delete<void>(`${environment.apiUrl}/admin/products/${productId}/variants/${variantId}`);
+    return this.http.delete<void>(
+      `${environment.apiUrl}/admin/products/${productId}/variants/${variantId}`,
+    );
   }
 
   addImage(productId: number, payload: ProductImageRequest): Observable<ProductImage> {
-    return this.http.post<ProductImage>(`${environment.apiUrl}/admin/products/${productId}/images`, payload);
+    return this.http.post<ProductImage>(
+      `${environment.apiUrl}/admin/products/${productId}/images`,
+      payload,
+    );
   }
 
   deleteImage(productId: number, imageId: number): Observable<void> {
-    return this.http.delete<void>(`${environment.apiUrl}/admin/products/${productId}/images/${imageId}`);
+    return this.http.delete<void>(
+      `${environment.apiUrl}/admin/products/${productId}/images/${imageId}`,
+    );
   }
 }

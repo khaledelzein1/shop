@@ -14,9 +14,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * Base commune à toutes les entités JPA : identifiant technique auto-généré
- * et horodatage d'audit (createdAt/updatedAt) gérés automatiquement par
- * Spring Data JPA auditing.
+ * Base commune à toutes les entités JPA : identifiant technique auto-généré et horodatage d'audit
+ * (createdAt/updatedAt) gérés automatiquement par Spring Data JPA auditing.
  */
 @Getter
 @MappedSuperclass
@@ -24,16 +23,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @EqualsAndHashCode.Include
+  private Long id;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+  @CreatedDate
+  @Column(nullable = false, updatable = false)
+  private Instant createdAt;
 
-    @LastModifiedDate
-    @Column(nullable = false)
-    private Instant updatedAt;
+  @LastModifiedDate
+  @Column(nullable = false)
+  private Instant updatedAt;
 }

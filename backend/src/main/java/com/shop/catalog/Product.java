@@ -24,35 +24,34 @@ import org.hibernate.annotations.BatchSize;
 @NoArgsConstructor
 public class Product extends BaseEntity {
 
-    @Column(nullable = false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    @Column(nullable = false, unique = true)
-    private String slug;
+  @Column(nullable = false, unique = true)
+  private String slug;
 
-    @Column(columnDefinition = "text")
-    private String description;
+  @Column(columnDefinition = "text")
+  private String description;
 
-    @Column
-    private String brand;
+  @Column private String brand;
 
-    @Column(nullable = false)
-    private boolean active = true;
+  @Column(nullable = false)
+  private boolean active = true;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "category_id", nullable = false)
+  private Category category;
 
-    // @BatchSize : évite le N+1 sur les listes paginées (charge les variantes/
-    // images de plusieurs produits en une requête IN(...) groupée plutôt qu'une
-    // requête par produit). Suffisant à l'échelle MVP ; une projection agrégée
-    // dédiée serait l'étape suivante si le volume le justifiait un jour.
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @BatchSize(size = 20)
-    private List<ProductVariant> variants = new ArrayList<>();
+  // @BatchSize : évite le N+1 sur les listes paginées (charge les variantes/
+  // images de plusieurs produits en une requête IN(...) groupée plutôt qu'une
+  // requête par produit). Suffisant à l'échelle MVP ; une projection agrégée
+  // dédiée serait l'étape suivante si le volume le justifiait un jour.
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  @BatchSize(size = 20)
+  private List<ProductVariant> variants = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("position ASC")
-    @BatchSize(size = 20)
-    private List<ProductImage> images = new ArrayList<>();
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("position ASC")
+  @BatchSize(size = 20)
+  private List<ProductImage> images = new ArrayList<>();
 }

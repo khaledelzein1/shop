@@ -20,23 +20,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductService productService;
+  private final ProductService productService;
 
-    @GetMapping
-    public PageResponse<ProductSummaryResponse> search(
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String brand,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) Boolean inStock,
-            @RequestParam(required = false) String q,
-            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
-        ProductFilter filter = new ProductFilter(category, brand, minPrice, maxPrice, inStock, q);
-        return productService.searchPublic(filter, pageable);
-    }
+  @GetMapping
+  public PageResponse<ProductSummaryResponse> search(
+      @RequestParam(required = false) String category,
+      @RequestParam(required = false) String brand,
+      @RequestParam(required = false) BigDecimal minPrice,
+      @RequestParam(required = false) BigDecimal maxPrice,
+      @RequestParam(required = false) Boolean inStock,
+      @RequestParam(required = false) String q,
+      @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+    ProductFilter filter = new ProductFilter(category, brand, minPrice, maxPrice, inStock, q);
+    return productService.searchPublic(filter, pageable);
+  }
 
-    @GetMapping("/{slug}")
-    public ProductResponse getBySlug(@PathVariable String slug) {
-        return productService.getPublicBySlug(slug);
-    }
+  @GetMapping("/{slug}")
+  public ProductResponse getBySlug(@PathVariable String slug) {
+    return productService.getPublicBySlug(slug);
+  }
 }

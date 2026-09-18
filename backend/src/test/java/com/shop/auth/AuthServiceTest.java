@@ -30,65 +30,63 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+  @Mock private UserRepository userRepository;
 
-    @Mock
-    private RoleRepository roleRepository;
+  @Mock private RoleRepository roleRepository;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
+  @Mock private PasswordEncoder passwordEncoder;
 
-    @Mock
-    private AuthenticationManager authenticationManager;
+  @Mock private AuthenticationManager authenticationManager;
 
-    @Mock
-    private JwtService jwtService;
+  @Mock private JwtService jwtService;
 
-    @Mock
-    private JwtProperties jwtProperties;
+  @Mock private JwtProperties jwtProperties;
 
-    @InjectMocks
-    private AuthService authService;
+  @InjectMocks private AuthService authService;
 
-    @Test
-    void register_withExistingEmail_throwsEmailAlreadyUsedException() {
-        RegisterRequest request = new RegisterRequest("taken@example.com", "password123", "A", "B");
-        when(userRepository.existsByEmail("taken@example.com")).thenReturn(true);
+  @Test
+  void register_withExistingEmail_throwsEmailAlreadyUsedException() {
+    RegisterRequest request = new RegisterRequest("taken@example.com", "password123", "A", "B");
+    when(userRepository.existsByEmail("taken@example.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> authService.register(request)).isInstanceOf(EmailAlreadyUsedException.class);
-    }
+    assertThatThrownBy(() -> authService.register(request))
+        .isInstanceOf(EmailAlreadyUsedException.class);
+  }
 
-    @Test
-    void register_withNewEmail_hashesPasswordAndAssignsUserRole() {
-        RegisterRequest request = new RegisterRequest("new@example.com", "password123", "A", "B");
-        Role userRole = new Role();
-        userRole.setName(RoleName.ROLE_USER);
+  @Test
+  void register_withNewEmail_hashesPasswordAndAssignsUserRole() {
+    RegisterRequest request = new RegisterRequest("new@example.com", "password123", "A", "B");
+    Role userRole = new Role();
+    userRole.setName(RoleName.ROLE_USER);
 
-        when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
-        when(roleRepository.findByName(RoleName.ROLE_USER)).thenReturn(Optional.of(userRole));
-        when(passwordEncoder.encode("password123")).thenReturn("hashed-password");
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
-            User user = invocation.getArgument(0);
-            ReflectionTestUtils.setField(user, "id", 42L);
-            return user;
-        });
-        when(jwtProperties.getExpirationMs()).thenReturn(86_400_000L);
-        when(jwtService.generateToken(any())).thenReturn("fake-jwt-token");
+    when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
+    when(roleRepository.findByName(RoleName.ROLE_USER)).thenReturn(Optional.of(userRole));
+    when(passwordEncoder.encode("password123")).thenReturn("hashed-password");
+    when(userRepository.save(any(User.class)))
+        .thenAnswer(
+            invocation -> {
+              User user = invocation.getArgument(0);
+              ReflectionTestUtils.setField(user, "id", 42L);
+              return user;
+            });
+    when(jwtProperties.getExpirationMs()).thenReturn(86_400_000L);
+    when(jwtService.generateToken(any())).thenReturn("fake-jwt-token");
 
-        AuthResponse response = authService.register(request);
+    AuthResponse response = authService.register(request);
 
-        assertThat(response.accessToken()).isEqualTo("fake-jwt-token");
-        assertThat(response.user().email()).isEqualTo("new@example.com");
-        assertThat(response.user().roles()).containsExactly("ROLE_USER");
-        assertThat(response.expiresInSeconds()).isEqualTo(86_400L);
-    }
+    assertThat(response.accessToken()).isEqualTo("fake-jwt-token");
+    assertThat(response.user().email()).isEqualTo("new@example.com");
+    assertThat(response.user().roles()).containsExactly("ROLE_USER");
+    assertThat(response.expiresInSeconds()).isEqualTo(86_400L);
+  }
 
-    @Test
-    void login_withBadCredentials_propagatesException() {
-        LoginRequest request = new LoginRequest("user@example.com", "wrong-password");
-        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("bad creds"));
+  @Test
+  void login_withBadCredentials_propagatesException() {
+    LoginRequest request = new LoginRequest("user@example.com", "wrong-password");
+    when(authenticationManager.authenticate(any()))
+        .thenThrow(new BadCredentialsException("bad creds"));
 
-        assertThatThrownBy(() -> authService.login(request)).isInstanceOf(BadCredentialsException.class);
-    }
+    assertThatThrownBy(() -> authService.login(request))
+        .isInstanceOf(BadCredentialsException.class);
+  }
 }

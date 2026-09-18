@@ -23,33 +23,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ProductVariantAdminController {
 
-    private final ProductVariantService productVariantService;
+  private final ProductVariantService productVariantService;
 
-    @PostMapping("/products/{productId}/variants")
-    public ResponseEntity<ProductVariantResponse> create(
-            @PathVariable Long productId, @Valid @RequestBody ProductVariantRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productVariantService.create(productId, request));
-    }
+  @PostMapping("/products/{productId}/variants")
+  public ResponseEntity<ProductVariantResponse> create(
+      @PathVariable Long productId, @Valid @RequestBody ProductVariantRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(productVariantService.create(productId, request));
+  }
 
-    @PutMapping("/products/{productId}/variants/{variantId}")
-    public ProductVariantResponse update(
-            @PathVariable Long productId,
-            @PathVariable Long variantId,
-            @Valid @RequestBody ProductVariantRequest request) {
-        return productVariantService.update(productId, variantId, request);
-    }
+  @PutMapping("/products/{productId}/variants/{variantId}")
+  public ProductVariantResponse update(
+      @PathVariable Long productId,
+      @PathVariable Long variantId,
+      @Valid @RequestBody ProductVariantRequest request) {
+    return productVariantService.update(productId, variantId, request);
+  }
 
-    @PatchMapping("/products/{productId}/variants/{variantId}/stock")
-    public ProductVariantResponse updateStock(
-            @PathVariable Long productId,
-            @PathVariable Long variantId,
-            @Valid @RequestBody UpdateStockRequest request) {
-        return productVariantService.updateStock(productId, variantId, request);
-    }
+  @PatchMapping("/products/{productId}/variants/{variantId}/stock")
+  public ProductVariantResponse updateStock(
+      @PathVariable Long productId,
+      @PathVariable Long variantId,
+      @Valid @RequestBody UpdateStockRequest request) {
+    return productVariantService.updateStock(productId, variantId, request);
+  }
 
-    @DeleteMapping("/products/{productId}/variants/{variantId}")
-    public ResponseEntity<Void> delete(@PathVariable Long productId, @PathVariable Long variantId) {
-        productVariantService.delete(productId, variantId);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/products/{productId}/variants/{variantId}")
+  public ResponseEntity<Void> delete(@PathVariable Long productId, @PathVariable Long variantId) {
+    productVariantService.delete(productId, variantId);
+    return ResponseEntity.noContent().build();
+  }
 }

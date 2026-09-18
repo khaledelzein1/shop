@@ -3,17 +3,14 @@ package com.shop.common.exception;
 import java.time.Instant;
 import java.util.List;
 
-/**
- * Format d'erreur JSON unique renvoyé par toute l'API.
- */
+/** Format d'erreur JSON unique renvoyé par toute l'API. */
 public record ApiError(
-        Instant timestamp,
-        int status,
-        String error,
-        String message,
-        String path,
-        List<FieldError> fieldErrors) {
+    Instant timestamp,
+    int status,
+    String error,
+    String message,
+    String path,
+    List<FieldError> fieldErrors) {
 
-    public record FieldError(String field, String message) {
-    }
+  public record FieldError(String field, String message) {}
 }

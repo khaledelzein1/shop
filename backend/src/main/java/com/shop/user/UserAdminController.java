@@ -24,25 +24,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserAdminController {
 
-    private final UserAdminService userAdminService;
+  private final UserAdminService userAdminService;
 
-    @GetMapping
-    public PageResponse<AdminUserResponse> search(
-            @RequestParam(required = false) String q,
-            @PageableDefault(size = 20, sort = "email") Pageable pageable) {
-        return userAdminService.search(q, pageable);
-    }
+  @GetMapping
+  public PageResponse<AdminUserResponse> search(
+      @RequestParam(required = false) String q,
+      @PageableDefault(size = 20, sort = "email") Pageable pageable) {
+    return userAdminService.search(q, pageable);
+  }
 
-    @GetMapping("/{id}")
-    public AdminUserResponse getById(@PathVariable Long id) {
-        return userAdminService.getById(id);
-    }
+  @GetMapping("/{id}")
+  public AdminUserResponse getById(@PathVariable Long id) {
+    return userAdminService.getById(id);
+  }
 
-    @PatchMapping("/{id}/status")
-    public AdminUserResponse updateStatus(
-            @AuthenticationPrincipal UserPrincipal principal,
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateUserStatusRequest request) {
-        return userAdminService.updateStatus(id, request.enabled(), principal.getId());
-    }
+  @PatchMapping("/{id}/status")
+  public AdminUserResponse updateStatus(
+      @AuthenticationPrincipal UserPrincipal principal,
+      @PathVariable Long id,
+      @Valid @RequestBody UpdateUserStatusRequest request) {
+    return userAdminService.updateStatus(id, request.enabled(), principal.getId());
+  }
 }

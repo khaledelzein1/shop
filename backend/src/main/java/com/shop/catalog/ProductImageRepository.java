@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
 
-    Optional<ProductImage> findByIdAndProductId(Long id, Long productId);
+  Optional<ProductImage> findByIdAndProductId(Long id, Long productId);
 }

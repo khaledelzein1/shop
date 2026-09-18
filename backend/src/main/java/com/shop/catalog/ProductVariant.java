@@ -17,10 +17,10 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 /**
- * Une déclinaison achetable d'un {@link Product} (ex. taille/couleur pour un
- * vêtement, RAM/stockage pour de l'informatique). Les attributs propres à la
- * catégorie sont stockés en JSONB plutôt que normalisés (voir docs/ARCHITECTURE.md §5)
- * pour rester flexible entre familles de produits très différentes.
+ * Une déclinaison achetable d'un {@link Product} (ex. taille/couleur pour un vêtement, RAM/stockage
+ * pour de l'informatique). Les attributs propres à la catégorie sont stockés en JSONB plutôt que
+ * normalisés (voir docs/ARCHITECTURE.md §5) pour rester flexible entre familles de produits très
+ * différentes.
  */
 @Entity
 @Table(name = "product_variants")
@@ -29,23 +29,23 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor
 public class ProductVariant extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
-    private String sku;
+  @Column(nullable = false, unique = true)
+  private String sku;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+  @Column(nullable = false, precision = 10, scale = 2)
+  private BigDecimal price;
 
-    @Column(nullable = false)
-    private int stock;
+  @Column(nullable = false)
+  private int stock;
 
-    @Column(nullable = false)
-    private boolean active = true;
+  @Column(nullable = false)
+  private boolean active = true;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
-    private Map<String, String> attributes = new HashMap<>();
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(nullable = false, columnDefinition = "jsonb")
+  private Map<String, String> attributes = new HashMap<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "product_id", nullable = false)
+  private Product product;
 }

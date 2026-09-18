@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Long> {
 
-    boolean existsBySku(String sku);
+  boolean existsBySku(String sku);
 
-    Optional<ProductVariant> findByIdAndProductId(Long id, Long productId);
+  Optional<ProductVariant> findByIdAndProductId(Long id, Long productId);
 }

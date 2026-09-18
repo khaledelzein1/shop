@@ -24,23 +24,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OrderAdminController {
 
-    private final OrderService orderService;
+  private final OrderService orderService;
 
-    @GetMapping
-    public PageResponse<AdminOrderSummaryResponse> search(
-            @RequestParam(required = false) OrderStatus status,
-            @RequestParam(required = false) Long userId,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return orderService.searchAdmin(status, userId, pageable);
-    }
+  @GetMapping
+  public PageResponse<AdminOrderSummaryResponse> search(
+      @RequestParam(required = false) OrderStatus status,
+      @RequestParam(required = false) Long userId,
+      @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return orderService.searchAdmin(status, userId, pageable);
+  }
 
-    @GetMapping("/{id}")
-    public OrderResponse getById(@PathVariable Long id) {
-        return orderService.getByIdForAdmin(id);
-    }
+  @GetMapping("/{id}")
+  public OrderResponse getById(@PathVariable Long id) {
+    return orderService.getByIdForAdmin(id);
+  }
 
-    @PatchMapping("/{id}/status")
-    public OrderResponse updateStatus(@PathVariable Long id, @Valid @RequestBody UpdateOrderStatusRequest request) {
-        return orderService.updateStatus(id, request.status());
-    }
+  @PatchMapping("/{id}/status")
+  public OrderResponse updateStatus(
+      @PathVariable Long id, @Valid @RequestBody UpdateOrderStatusRequest request) {
+    return orderService.updateStatus(id, request.status());
+  }
 }

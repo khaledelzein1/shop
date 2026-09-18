@@ -19,24 +19,24 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Address extends BaseEntity {
 
-    private String label;
+  private String label;
 
-    @Column(nullable = false)
-    private String street;
+  @Column(nullable = false)
+  private String street;
 
-    @Column(nullable = false)
-    private String city;
+  @Column(nullable = false)
+  private String city;
 
-    @Column(name = "zip_code", nullable = false)
-    private String zipCode;
+  @Column(name = "zip_code", nullable = false)
+  private String zipCode;
 
-    @Column(nullable = false)
-    private String country;
+  @Column(nullable = false)
+  private String country;
 
-    @Column(name = "is_default", nullable = false)
-    private boolean defaultAddress = false;
+  @Column(name = "is_default", nullable = false)
+  private boolean defaultAddress = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 }

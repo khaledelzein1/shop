@@ -18,44 +18,44 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Catégories : ressource simple et publique en lecture ; les mutations sont
- * protégées méthode par méthode (pas besoin d'un sous-chemin /admin dédié
- * comme pour les produits, qui eux ont un statut actif/inactif à gérer côté
- * admin — voir docs/ARCHITECTURE.md).
+ * Catégories : ressource simple et publique en lecture ; les mutations sont protégées méthode par
+ * méthode (pas besoin d'un sous-chemin /admin dédié comme pour les produits, qui eux ont un statut
+ * actif/inactif à gérer côté admin — voir docs/ARCHITECTURE.md).
  */
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final CategoryService categoryService;
+  private final CategoryService categoryService;
 
-    @GetMapping
-    public List<CategoryResponse> list() {
-        return categoryService.list();
-    }
+  @GetMapping
+  public List<CategoryResponse> list() {
+    return categoryService.list();
+  }
 
-    @GetMapping("/{slug}")
-    public CategoryResponse getBySlug(@PathVariable String slug) {
-        return categoryService.getBySlug(slug);
-    }
+  @GetMapping("/{slug}")
+  public CategoryResponse getBySlug(@PathVariable String slug) {
+    return categoryService.getBySlug(slug);
+  }
 
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(request));
-    }
+  @PostMapping
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(request));
+  }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public CategoryResponse update(@PathVariable Long id, @Valid @RequestBody CategoryRequest request) {
-        return categoryService.update(id, request);
-    }
+  @PutMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
+  public CategoryResponse update(
+      @PathVariable Long id, @Valid @RequestBody CategoryRequest request) {
+    return categoryService.update(id, request);
+  }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        categoryService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<Void> delete(@PathVariable Long id) {
+    categoryService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
 }

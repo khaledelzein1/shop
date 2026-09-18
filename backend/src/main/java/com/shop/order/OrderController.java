@@ -25,23 +25,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final OrderService orderService;
+  private final OrderService orderService;
 
-    @PostMapping("/checkout")
-    public ResponseEntity<OrderResponse> checkout(
-            @AuthenticationPrincipal UserPrincipal principal, @Valid @RequestBody CheckoutRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.checkout(principal.getId(), request));
-    }
+  @PostMapping("/checkout")
+  public ResponseEntity<OrderResponse> checkout(
+      @AuthenticationPrincipal UserPrincipal principal,
+      @Valid @RequestBody CheckoutRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(orderService.checkout(principal.getId(), request));
+  }
 
-    @GetMapping
-    public PageResponse<OrderSummaryResponse> history(
-            @AuthenticationPrincipal UserPrincipal principal,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return orderService.history(principal.getId(), pageable);
-    }
+  @GetMapping
+  public PageResponse<OrderSummaryResponse> history(
+      @AuthenticationPrincipal UserPrincipal principal,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return orderService.history(principal.getId(), pageable);
+  }
 
-    @GetMapping("/{id}")
-    public OrderResponse getOrder(@AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {
-        return orderService.getOrderForUser(principal.getId(), id);
-    }
+  @GetMapping("/{id}")
+  public OrderResponse getOrder(
+      @AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {
+    return orderService.getOrderForUser(principal.getId(), id);
+  }
 }

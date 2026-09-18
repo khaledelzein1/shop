@@ -24,9 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Gestion admin du catalogue : contrairement à {@link ProductController},
- * expose aussi les produits inactifs (brouillons/désactivés) — d'où un
- * chemin séparé plutôt qu'un paramètre conditionnel sur l'endpoint public.
+ * Gestion admin du catalogue : contrairement à {@link ProductController}, expose aussi les produits
+ * inactifs (brouillons/désactivés) — d'où un chemin séparé plutôt qu'un paramètre conditionnel sur
+ * l'endpoint public.
  */
 @RestController
 @RequestMapping("/api/admin/products")
@@ -34,39 +34,39 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ProductAdminController {
 
-    private final ProductService productService;
+  private final ProductService productService;
 
-    @GetMapping
-    public PageResponse<ProductSummaryResponse> search(
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String brand,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) Boolean inStock,
-            @RequestParam(required = false) String q,
-            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
-        ProductFilter filter = new ProductFilter(category, brand, minPrice, maxPrice, inStock, q);
-        return productService.searchAdmin(filter, pageable);
-    }
+  @GetMapping
+  public PageResponse<ProductSummaryResponse> search(
+      @RequestParam(required = false) String category,
+      @RequestParam(required = false) String brand,
+      @RequestParam(required = false) BigDecimal minPrice,
+      @RequestParam(required = false) BigDecimal maxPrice,
+      @RequestParam(required = false) Boolean inStock,
+      @RequestParam(required = false) String q,
+      @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+    ProductFilter filter = new ProductFilter(category, brand, minPrice, maxPrice, inStock, q);
+    return productService.searchAdmin(filter, pageable);
+  }
 
-    @GetMapping("/{id}")
-    public ProductResponse getById(@PathVariable Long id) {
-        return productService.getByIdForAdmin(id);
-    }
+  @GetMapping("/{id}")
+  public ProductResponse getById(@PathVariable Long id) {
+    return productService.getByIdForAdmin(id);
+  }
 
-    @PostMapping
-    public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(request));
-    }
+  @PostMapping
+  public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(productService.create(request));
+  }
 
-    @PutMapping("/{id}")
-    public ProductResponse update(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
-        return productService.update(id, request);
-    }
+  @PutMapping("/{id}")
+  public ProductResponse update(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+    return productService.update(id, request);
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        productService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable Long id) {
+    productService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
 }

@@ -20,24 +20,24 @@ import lombok.Setter;
 @NoArgsConstructor
 public class OrderItem extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "order_id", nullable = false)
+  private Order order;
 
-    /** Référence de navigation uniquement — jamais utilisée pour recalculer le prix a posteriori. */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "variant_id")
-    private ProductVariant variant;
+  /** Référence de navigation uniquement — jamais utilisée pour recalculer le prix a posteriori. */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "variant_id")
+  private ProductVariant variant;
 
-    @Column(name = "product_name", nullable = false)
-    private String productName;
+  @Column(name = "product_name", nullable = false)
+  private String productName;
 
-    @Column(nullable = false)
-    private String sku;
+  @Column(nullable = false)
+  private String sku;
 
-    @Column(nullable = false)
-    private int quantity;
+  @Column(nullable = false)
+  private int quantity;
 
-    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal unitPrice;
+  @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
+  private BigDecimal unitPrice;
 }

@@ -23,11 +23,11 @@ import org.hibernate.annotations.BatchSize;
 @NoArgsConstructor
 public class Cart extends BaseEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private User user;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    @BatchSize(size = 20)
-    private List<CartItem> items = new ArrayList<>();
+  @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+  @BatchSize(size = 20)
+  private List<CartItem> items = new ArrayList<>();
 }

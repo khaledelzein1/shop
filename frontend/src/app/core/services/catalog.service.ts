@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Category, CategoryRequest } from '../models/category.model';
@@ -8,7 +8,7 @@ import { Product, ProductFilter, ProductSummary } from '../models/product.model'
 
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
-  constructor(private readonly http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   listCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${environment.apiUrl}/categories`);
@@ -26,7 +26,11 @@ export class CatalogService {
     return this.http.delete<void>(`${environment.apiUrl}/categories/${id}`);
   }
 
-  searchProducts(filter: ProductFilter, page: number, size: number): Observable<PageResponse<ProductSummary>> {
+  searchProducts(
+    filter: ProductFilter,
+    page: number,
+    size: number,
+  ): Observable<PageResponse<ProductSummary>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (filter.category) params = params.set('category', filter.category);
     if (filter.brand) params = params.set('brand', filter.brand);
@@ -35,7 +39,9 @@ export class CatalogService {
     if (filter.inStock != null) params = params.set('inStock', filter.inStock);
     if (filter.q) params = params.set('q', filter.q);
 
-    return this.http.get<PageResponse<ProductSummary>>(`${environment.apiUrl}/products`, { params });
+    return this.http.get<PageResponse<ProductSummary>>(`${environment.apiUrl}/products`, {
+      params,
+    });
   }
 
   getProductBySlug(slug: string): Observable<Product> {

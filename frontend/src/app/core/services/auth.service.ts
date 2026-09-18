@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -10,16 +10,16 @@ const USER_KEY = 'shop_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+
   private readonly currentUserSignal = signal<User | null>(this.readStoredUser());
 
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.currentUserSignal() !== null);
-  readonly isAdmin = computed(() => this.currentUserSignal()?.roles.includes('ROLE_ADMIN') ?? false);
-
-  constructor(
-    private readonly http: HttpClient,
-    private readonly router: Router,
-  ) {}
+  readonly isAdmin = computed(
+    () => this.currentUserSignal()?.roles.includes('ROLE_ADMIN') ?? false,
+  );
 
   register(payload: RegisterPayload): Observable<AuthResponse> {
     return this.http

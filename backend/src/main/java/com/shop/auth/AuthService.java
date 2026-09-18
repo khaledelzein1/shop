@@ -25,46 +25,54 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final JwtProperties jwtProperties;
+  private final UserRepository userRepository;
+  private final RoleRepository roleRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final AuthenticationManager authenticationManager;
+  private final JwtService jwtService;
+  private final JwtProperties jwtProperties;
 
-    @Transactional
-    public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
-            throw new EmailAlreadyUsedException(request.email());
-        }
+  @Transactional
+  public AuthResponse register(RegisterRequest request) {
+    if (userRepository.existsByEmail(request.email())) {
+      throw new EmailAlreadyUsedException(request.email());
+    }
 
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-                .orElseThrow(() -> new IllegalStateException(
+    Role userRole =
+        roleRepository
+            .findByName(RoleName.ROLE_USER)
+            .orElseThrow(
+                () ->
+                    new IllegalStateException(
                         "Rôle ROLE_USER manquant en base — la migration de seed a-t-elle bien tourné ?"));
 
-        User user = new User();
-        user.setEmail(request.email());
-        user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setFirstName(request.firstName());
-        user.setLastName(request.lastName());
-        user.setRoles(Set.of(userRole));
-        userRepository.save(user);
+    User user = new User();
+    user.setEmail(request.email());
+    user.setPasswordHash(passwordEncoder.encode(request.password()));
+    user.setFirstName(request.firstName());
+    user.setLastName(request.lastName());
+    user.setRoles(Set.of(userRole));
+    userRepository.save(user);
 
-        return buildAuthResponse(user);
-    }
+    return buildAuthResponse(user);
+  }
 
-    public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+  public AuthResponse login(LoginRequest request) {
+    authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalStateException("Utilisateur authentifié introuvable en base"));
+    User user =
+        userRepository
+            .findByEmail(request.email())
+            .orElseThrow(
+                () -> new IllegalStateException("Utilisateur authentifié introuvable en base"));
 
-        return buildAuthResponse(user);
-    }
+    return buildAuthResponse(user);
+  }
 
-    private AuthResponse buildAuthResponse(User user) {
-        String token = jwtService.generateToken(new UserPrincipal(user));
-        return new AuthResponse(token, "Bearer", jwtProperties.getExpirationMs() / 1000, UserResponse.from(user));
-    }
+  private AuthResponse buildAuthResponse(User user) {
+    String token = jwtService.generateToken(new UserPrincipal(user));
+    return new AuthResponse(
+        token, "Bearer", jwtProperties.getExpirationMs() / 1000, UserResponse.from(user));
+  }
 }

@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Address, AddressPayload } from '../models/address.model';
 
 @Injectable({ providedIn: 'root' })
 export class AddressService {
-  constructor(private readonly http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   list(): Observable<Address[]> {
     return this.http.get<Address[]>(`${environment.apiUrl}/me/addresses`);

@@ -15,12 +15,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Category extends BaseEntity {
 
-    @Column(nullable = false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    @Column(nullable = false, unique = true)
-    private String slug;
+  @Column(nullable = false, unique = true)
+  private String slug;
 
-    @Column
-    private String description;
+  @Column private String description;
 }

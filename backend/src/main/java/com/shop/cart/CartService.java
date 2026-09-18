@@ -17,84 +17,103 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CartService {
 
-    private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
-    private final UserRepository userRepository;
-    private final ProductVariantRepository variantRepository;
+  private final CartRepository cartRepository;
+  private final CartItemRepository cartItemRepository;
+  private final UserRepository userRepository;
+  private final ProductVariantRepository variantRepository;
 
-    @Transactional(readOnly = true)
-    public CartResponse getCart(Long userId) {
-        return cartRepository.findByUserId(userId).map(CartResponse::from).orElseGet(CartResponse::empty);
-    }
+  @Transactional(readOnly = true)
+  public CartResponse getCart(Long userId) {
+    return cartRepository
+        .findByUserId(userId)
+        .map(CartResponse::from)
+        .orElseGet(CartResponse::empty);
+  }
 
-    @Transactional
-    public CartResponse addItem(Long userId, AddCartItemRequest request) {
-        Cart cart = getOrCreateCart(userId);
-        ProductVariant variant = variantRepository.findById(request.variantId())
-                .filter(ProductVariant::isActive)
-                .orElseThrow(() -> new ResourceNotFoundException(
+  @Transactional
+  public CartResponse addItem(Long userId, AddCartItemRequest request) {
+    Cart cart = getOrCreateCart(userId);
+    ProductVariant variant =
+        variantRepository
+            .findById(request.variantId())
+            .filter(ProductVariant::isActive)
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(
                         "Variante introuvable ou indisponible (id=" + request.variantId() + ")"));
 
-        Optional<CartItem> existing = cartItemRepository.findByCartIdAndVariantId(cart.getId(), variant.getId());
-        int newQuantity = existing.map(CartItem::getQuantity).orElse(0) + request.quantity();
-        ensureStockAvailable(variant, newQuantity);
+    Optional<CartItem> existing =
+        cartItemRepository.findByCartIdAndVariantId(cart.getId(), variant.getId());
+    int newQuantity = existing.map(CartItem::getQuantity).orElse(0) + request.quantity();
+    ensureStockAvailable(variant, newQuantity);
 
-        if (existing.isPresent()) {
-            CartItem item = existing.get();
-            item.setQuantity(newQuantity);
-            item.setUnitPriceSnapshot(variant.getPrice());
-        } else {
-            CartItem item = new CartItem();
-            item.setCart(cart);
-            item.setVariant(variant);
-            item.setQuantity(request.quantity());
-            item.setUnitPriceSnapshot(variant.getPrice());
-            cart.getItems().add(item);
-            cartItemRepository.save(item);
-        }
-
-        return CartResponse.from(cart);
+    if (existing.isPresent()) {
+      CartItem item = existing.get();
+      item.setQuantity(newQuantity);
+      item.setUnitPriceSnapshot(variant.getPrice());
+    } else {
+      CartItem item = new CartItem();
+      item.setCart(cart);
+      item.setVariant(variant);
+      item.setQuantity(request.quantity());
+      item.setUnitPriceSnapshot(variant.getPrice());
+      cart.getItems().add(item);
+      cartItemRepository.save(item);
     }
 
-    @Transactional
-    public CartResponse updateItemQuantity(Long userId, Long itemId, UpdateCartItemRequest request) {
-        Cart cart = getCartOrThrow(userId);
-        CartItem item = findOwnedItemOrThrow(cart, itemId);
-        ensureStockAvailable(item.getVariant(), request.quantity());
-        item.setQuantity(request.quantity());
-        return CartResponse.from(cart);
-    }
+    return CartResponse.from(cart);
+  }
 
-    @Transactional
-    public CartResponse removeItem(Long userId, Long itemId) {
-        Cart cart = getCartOrThrow(userId);
-        CartItem item = findOwnedItemOrThrow(cart, itemId);
-        cartItemRepository.delete(item);
-        return CartResponse.from(cart);
-    }
+  @Transactional
+  public CartResponse updateItemQuantity(Long userId, Long itemId, UpdateCartItemRequest request) {
+    Cart cart = getCartOrThrow(userId);
+    CartItem item = findOwnedItemOrThrow(cart, itemId);
+    ensureStockAvailable(item.getVariant(), request.quantity());
+    item.setQuantity(request.quantity());
+    return CartResponse.from(cart);
+  }
 
-    private void ensureStockAvailable(ProductVariant variant, int requestedQuantity) {
-        if (requestedQuantity > variant.getStock()) {
-            throw new ConflictException(
-                    "Stock insuffisant pour '" + variant.getSku() + "' (" + variant.getStock() + " disponible(s))");
-        }
-    }
+  @Transactional
+  public CartResponse removeItem(Long userId, Long itemId) {
+    Cart cart = getCartOrThrow(userId);
+    CartItem item = findOwnedItemOrThrow(cart, itemId);
+    cartItemRepository.delete(item);
+    return CartResponse.from(cart);
+  }
 
-    private Cart getOrCreateCart(Long userId) {
-        return cartRepository.findByUserId(userId).orElseGet(() -> {
-            Cart cart = new Cart();
-            cart.setUser(userRepository.getReferenceById(userId));
-            return cartRepository.save(cart);
-        });
+  private void ensureStockAvailable(ProductVariant variant, int requestedQuantity) {
+    if (requestedQuantity > variant.getStock()) {
+      throw new ConflictException(
+          "Stock insuffisant pour '"
+              + variant.getSku()
+              + "' ("
+              + variant.getStock()
+              + " disponible(s))");
     }
+  }
 
-    private Cart getCartOrThrow(Long userId) {
-        return cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Panier introuvable"));
-    }
+  private Cart getOrCreateCart(Long userId) {
+    return cartRepository
+        .findByUserId(userId)
+        .orElseGet(
+            () -> {
+              Cart cart = new Cart();
+              cart.setUser(userRepository.getReferenceById(userId));
+              return cartRepository.save(cart);
+            });
+  }
 
-    private CartItem findOwnedItemOrThrow(Cart cart, Long itemId) {
-        return cartItemRepository.findByIdAndCartId(itemId, cart.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Article de panier introuvable (id=" + itemId + ")"));
-    }
+  private Cart getCartOrThrow(Long userId) {
+    return cartRepository
+        .findByUserId(userId)
+        .orElseThrow(() -> new ResourceNotFoundException("Panier introuvable"));
+  }
+
+  private CartItem findOwnedItemOrThrow(Cart cart, Long itemId) {
+    return cartItemRepository
+        .findByIdAndCartId(itemId, cart.getId())
+        .orElseThrow(
+            () ->
+                new ResourceNotFoundException("Article de panier introuvable (id=" + itemId + ")"));
+  }
 }

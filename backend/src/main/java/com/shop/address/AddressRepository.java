@@ -9,11 +9,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface AddressRepository extends JpaRepository<Address, Long> {
 
-    List<Address> findByUserIdOrderByDefaultAddressDescCreatedAtAsc(Long userId);
+  List<Address> findByUserIdOrderByDefaultAddressDescCreatedAtAsc(Long userId);
 
-    Optional<Address> findByIdAndUserId(Long id, Long userId);
+  Optional<Address> findByIdAndUserId(Long id, Long userId);
 
-    @Modifying
-    @Query("update Address a set a.defaultAddress = false where a.user.id = :userId")
-    void clearDefaultForUser(@Param("userId") Long userId);
+  @Modifying
+  @Query("update Address a set a.defaultAddress = false where a.user.id = :userId")
+  void clearDefaultForUser(@Param("userId") Long userId);
 }

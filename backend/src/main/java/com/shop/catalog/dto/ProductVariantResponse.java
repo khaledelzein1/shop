@@ -5,20 +5,20 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public record ProductVariantResponse(
-        Long id,
-        String sku,
-        BigDecimal price,
-        int stock,
-        boolean active,
-        Map<String, String> attributes) {
+    Long id,
+    String sku,
+    BigDecimal price,
+    int stock,
+    boolean active,
+    Map<String, String> attributes) {
 
-    public static ProductVariantResponse from(ProductVariant variant) {
-        return new ProductVariantResponse(
-                variant.getId(),
-                variant.getSku(),
-                variant.getPrice(),
-                variant.getStock(),
-                variant.isActive(),
-                variant.getAttributes());
-    }
+  public static ProductVariantResponse from(ProductVariant variant) {
+    return new ProductVariantResponse(
+        variant.getId(),
+        variant.getSku(),
+        variant.getPrice(),
+        variant.getStock(),
+        variant.isActive(),
+        variant.getAttributes());
+  }
 }
