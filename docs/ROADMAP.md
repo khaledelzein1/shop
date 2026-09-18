@@ -17,9 +17,19 @@ tout le projet d'un coup.
         encore installé sur la machine (compilation validée avec
         `-Dmaven.compiler.release=17` en attendant) et Docker Desktop pas
         lancé au moment du test. À revalider dès que les deux sont prêts.
-- [ ] **Étape 2 — Sécurité**
-  - [ ] Spring Security + JWT (login, register, refresh)
-  - [ ] Rôles USER / ADMIN, endpoints protégés
+- [x] **Étape 2 — Sécurité**
+  - [x] Spring Security + JWT stateless (`/api/auth/register`, `/api/auth/login`) —
+        pas de refresh token en MVP, expiration 24h (voir compromis dans
+        `ARCHITECTURE.md`, rotation prévue en étape 10)
+  - [x] Rôles USER / ADMIN (seed via `V2__seed_roles.sql`), `@EnableMethodSecurity`
+        pour protéger les futurs endpoints admin avec `@PreAuthorize`
+  - [x] Gestion d'erreurs globale (`GlobalExceptionHandler` + `ApiError`)
+  - [x] Swagger UI (springdoc) avec bouton "Authorize" JWT
+  - [x] Compte admin de démo auto-créé au démarrage (`AdminAccountInitializer`,
+        désactivable via `SEED_ADMIN_ENABLED=false`)
+  - [ ] ⚠️ Non vérifié de bout en bout (register → login → endpoint protégé)
+        faute de JDK 21 et de Docker Desktop actifs sur la machine au moment
+        du test — code compilé et relu, à valider dès que possible
 - [ ] **Étape 3 — Catalogue (API)**
   - [ ] CRUD catégories (admin) / lecture publique
   - [ ] CRUD produits + variantes (admin)

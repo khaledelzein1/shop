@@ -23,3 +23,19 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+app:
+  jwt:
+    # ⚠️ valeur par défaut pour le dev local uniquement — à surcharger via
+    # la variable d'env JWT_SECRET dans tout environnement partagé/déployé.
+    secret: ${JWT_SECRET:local-dev-only-change-me-32-bytes-minimum-secret-key}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000} # 24h — pas de refresh token en MVP (voir ROADMAP étape 10)
+  seed:
+    admin:
+      enabled: ${SEED_ADMIN_ENABLED:true}
+      email: ${SEED_ADMIN_EMAIL:admin@shop.local}
+      password: ${SEED_ADMIN_PASSWORD:ChangeMe123!}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
