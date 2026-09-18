@@ -1,0 +1,71 @@
+<div class="catalog">
+  <aside class="catalog__filters card">
+    <h2>Filtres</h2>
+
+    <div class="form-field">
+      <label for="category">Catégorie</label>
+      <select id="category" [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()">
+        <option value="">Toutes</option>
+        @for (cat of categories(); track cat.id) {
+          <option [value]="cat.slug">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="q">Recherche</label>
+      <input
+        id="q"
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onFilterChange()"
+        placeholder="Nom du produit..."
+      />
+    </div>
+
+    <label class="catalog__checkbox">
+      <input type="checkbox" [(ngModel)]="onlyInStock" (ngModelChange)="onFilterChange()" />
+      En stock uniquement
+    </label>
+
+    <button type="button" class="btn btn--secondary" (click)="onFilterChange()">Appliquer</button>
+  </aside>
+
+  <section class="catalog__results">
+    @if (loading()) {
+      <p>Chargement...</p>
+    } @else if (products().length === 0) {
+      <p>Aucun produit ne correspond à ces critères.</p>
+    } @else {
+      <div class="catalog__grid">
+        @for (product of products(); track product.id) {
+          <a class="product-card" [routerLink]="['/products', product.slug]">
+            <img [src]="product.primaryImageUrl ?? 'https://placehold.co/300x300?text=Shop'" [alt]="product.name" />
+            <div class="product-card__body">
+              <p class="product-card__brand">{{ product.brand }}</p>
+              <h3>{{ product.name }}</h3>
+              <p class="product-card__price">
+                @if (product.minPrice === product.maxPrice) {
+                  {{ product.minPrice | number: "1.2-2" }} €
+                } @else {
+                  Dès {{ product.minPrice | number: "1.2-2" }} €
+                }
+              </p>
+              @if (!product.inStock) {
+                <span class="product-card__badge">Rupture de stock</span>
+              }
+            </div>
+          </a>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="catalog__pagination">
+          @for (p of pageNumbers(); track p) {
+            <button type="button" [class.is-active]="p === page()" (click)="goToPage(p)">{{ p + 1 }}</button>
+          }
+        </div>
+      }
+    }
+  </section>
+</div>

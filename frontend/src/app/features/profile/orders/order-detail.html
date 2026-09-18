@@ -1,0 +1,36 @@
+@if (loading()) {
+  <p>Chargement...</p>
+} @else if (order(); as o) {
+  <a routerLink="/profile/orders" class="back-link">← Mes commandes</a>
+  <h1>Commande #{{ o.id }}</h1>
+  <p>
+    <span class="status-pill" [class]="o.status">{{ o.status }}</span>
+    · passée le {{ o.createdAt | date: "dd/MM/yyyy à HH:mm" }}
+  </p>
+
+  <div class="order-detail">
+    <div class="card order-detail__items">
+      <h2>Articles</h2>
+      @for (item of o.items; track item.id) {
+        <div class="order-line">
+          <span>{{ item.productName }} ({{ item.sku }}) × {{ item.quantity }}</span>
+          <span>{{ item.lineTotal | number: "1.2-2" }} €</span>
+        </div>
+      }
+      <div class="order-total">
+        <span>Total</span>
+        <span>{{ o.totalAmount | number: "1.2-2" }} €</span>
+      </div>
+    </div>
+
+    <div class="card order-detail__address">
+      <h2>Livraison</h2>
+      <p>
+        <strong>{{ o.shippingAddress.label || "Adresse" }}</strong><br />
+        {{ o.shippingAddress.street }}<br />
+        {{ o.shippingAddress.zipCode }} {{ o.shippingAddress.city }}<br />
+        {{ o.shippingAddress.country }}
+      </p>
+    </div>
+  </div>
+}

@@ -1,0 +1,87 @@
+.header {
+  background: #1f2937;
+  color: #f9fafb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  &__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  &__brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f9fafb;
+    text-decoration: none;
+  }
+
+  &__nav {
+    display: flex;
+    gap: 1.25rem;
+    flex: 1;
+
+    a {
+      color: #d1d5db;
+      text-decoration: none;
+      font-size: 0.9rem;
+
+      &.is-active {
+        color: #f9fafb;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    a {
+      color: #d1d5db;
+      text-decoration: none;
+      font-size: 0.9rem;
+
+      &.is-active {
+        color: #f9fafb;
+        font-weight: 600;
+      }
+    }
+
+    button {
+      background: transparent;
+      border: 1px solid #4b5563;
+      color: #f9fafb;
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+
+      &:hover {
+        background: #374151;
+      }
+    }
+  }
+
+  &__cart {
+    position: relative;
+  }
+
+  &__badge {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.9rem;
+    background: #ef4444;
+    color: white;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    font-weight: 700;
+  }
+}

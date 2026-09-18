@@ -1,0 +1,16 @@
+.address-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.address-card p {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+}
+
+.address-form {
+  max-width: 420px;
+  margin-top: 1rem;
+}

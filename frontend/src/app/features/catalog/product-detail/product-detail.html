@@ -1,0 +1,71 @@
+@if (loading()) {
+  <p>Chargement...</p>
+} @else if (product(); as p) {
+  <div class="product-detail">
+    <div class="product-detail__gallery">
+      @if (p.images.length > 0) {
+        <img [src]="p.images[0].url" [alt]="p.name" />
+      } @else {
+        <img src="https://placehold.co/500x500?text=Shop" [alt]="p.name" />
+      }
+    </div>
+
+    <div class="product-detail__info">
+      <a routerLink="/products" class="back-link">← Retour au catalogue</a>
+      <p class="product-detail__brand">{{ p.brand }} · {{ p.category.name }}</p>
+      <h1>{{ p.name }}</h1>
+      <p class="product-detail__description">{{ p.description }}</p>
+
+      @if (selectedVariant(); as variant) {
+        <p class="product-detail__price">{{ variant.price | number: "1.2-2" }} €</p>
+      }
+
+      <div class="variant-picker">
+        <span class="variant-picker__label">Variante</span>
+        <div class="variant-picker__options">
+          @for (variant of p.variants; track variant.id) {
+            <button
+              type="button"
+              class="variant-chip"
+              [class.is-selected]="selectedVariant()?.id === variant.id"
+              [disabled]="!variant.active || variant.stock === 0"
+              (click)="selectVariant(variant)"
+            >
+              @for (attr of variant.attributes | keyvalue; track attr.key) {
+                {{ attr.value }}
+              }
+              @if (variant.stock === 0) {
+                (rupture)
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (selectedVariant(); as variant) {
+        <p class="product-detail__stock">{{ variant.stock }} en stock (SKU {{ variant.sku }})</p>
+
+        @if (variant.stock > 0) {
+          <div class="add-to-cart">
+            <input
+              type="number"
+              min="1"
+              [max]="variant.stock"
+              [ngModel]="quantity()"
+              (ngModelChange)="quantity.set($event)"
+            />
+            <button type="button" class="btn" [disabled]="addingToCart()" (click)="addToCart()">
+              {{ addingToCart() ? "Ajout..." : "Ajouter au panier" }}
+            </button>
+          </div>
+
+          @if (addedMessage()) {
+            <p class="alert alert--success">Ajouté au panier !</p>
+          }
+        } @else {
+          <button type="button" class="btn" disabled>Rupture de stock</button>
+        }
+      }
+    </div>
+  </div>
+}

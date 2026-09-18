@@ -1,0 +1,56 @@
+<h1>Finaliser la commande</h1>
+
+@if (loading()) {
+  <p>Chargement...</p>
+} @else if (cart().items.length === 0) {
+  <p>Ton panier est vide. <a routerLink="/products">Voir le catalogue</a></p>
+} @else if (addresses().length === 0) {
+  <p>
+    Tu n'as pas encore d'adresse enregistrée.
+    <a routerLink="/profile/addresses">Ajoute une adresse</a> avant de commander.
+  </p>
+} @else {
+  <div class="checkout">
+    <div class="checkout__addresses card">
+      <h2>Adresse de livraison</h2>
+      @for (address of addresses(); track address.id) {
+        <label class="address-option">
+          <input
+            type="radio"
+            name="address"
+            [checked]="selectedAddressId() === address.id"
+            (change)="selectedAddressId.set(address.id)"
+          />
+          <span>
+            <strong>{{ address.label || "Adresse" }}</strong><br />
+            {{ address.street }}, {{ address.zipCode }} {{ address.city }}, {{ address.country }}
+          </span>
+        </label>
+      }
+      <a routerLink="/profile/addresses" class="checkout__manage-link">Gérer mes adresses</a>
+    </div>
+
+    <div class="checkout__summary card">
+      <h2>Récapitulatif</h2>
+      @for (item of cart().items; track item.id) {
+        <div class="checkout-line">
+          <span>{{ item.productName }} × {{ item.quantity }}</span>
+          <span>{{ item.lineTotal | number: "1.2-2" }} €</span>
+        </div>
+      }
+      <div class="checkout-total">
+        <span>Total</span>
+        <span>{{ cart().totalAmount | number: "1.2-2" }} €</span>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert--error">{{ errorMessage() }}</div>
+      }
+
+      <button type="button" class="btn" [disabled]="submitting()" (click)="confirm()">
+        {{ submitting() ? "Validation..." : "Confirmer la commande" }}
+      </button>
+      <p class="checkout__note">Paiement simulé — aucune carte bancaire n'est demandée.</p>
+    </div>
+  </div>
+}

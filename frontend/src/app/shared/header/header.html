@@ -1,0 +1,29 @@
+<header class="header">
+  <div class="header__inner">
+    <a routerLink="/" class="header__brand">Shop</a>
+
+    <nav class="header__nav">
+      <a routerLink="/products" routerLinkActive="is-active">Catalogue</a>
+      @if (auth.isAdmin()) {
+        <a routerLink="/admin" routerLinkActive="is-active">Admin</a>
+      }
+    </nav>
+
+    <div class="header__actions">
+      <a routerLink="/cart" routerLinkActive="is-active" class="header__cart">
+        Panier
+        @if (cart.itemCount() > 0) {
+          <span class="header__badge">{{ cart.itemCount() }}</span>
+        }
+      </a>
+
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/profile/orders" routerLinkActive="is-active">{{ auth.currentUser()?.firstName }}</a>
+        <button type="button" (click)="logout()">Déconnexion</button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="is-active">Connexion</a>
+        <a routerLink="/register" routerLinkActive="is-active">Inscription</a>
+      }
+    </div>
+  </div>
+</header>

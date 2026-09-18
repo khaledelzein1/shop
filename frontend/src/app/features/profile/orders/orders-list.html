@@ -1,0 +1,32 @@
+<h1>Mes commandes</h1>
+
+@if (loading()) {
+  <p>Chargement...</p>
+} @else if (orders().length === 0) {
+  <p>Tu n'as pas encore passé de commande. <a routerLink="/products">Voir le catalogue</a></p>
+} @else {
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Commande</th>
+        <th>Date</th>
+        <th>Statut</th>
+        <th>Articles</th>
+        <th>Total</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (order of orders(); track order.id) {
+        <tr>
+          <td>#{{ order.id }}</td>
+          <td>{{ order.createdAt | date: "dd/MM/yyyy" }}</td>
+          <td><span class="status-pill" [class]="order.status">{{ order.status }}</span></td>
+          <td>{{ order.itemCount }}</td>
+          <td>{{ order.totalAmount | number: "1.2-2" }} €</td>
+          <td><a [routerLink]="['/profile/orders', order.id]">Détail</a></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
