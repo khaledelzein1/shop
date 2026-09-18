@@ -126,10 +126,19 @@ tout le projet d'un coup.
   - [ ] Déploiement cloud (Render/Railway/Fly.io) — reporté : nécessite un
         compte/service externe, décision à prendre avec l'utilisateur avant
         de continuer
-- [ ] **Étape 8 — Observabilité**
-  - [ ] Spring Actuator (health, info)
-  - [ ] Logs structurés
-  - [ ] Métriques de base (Prometheus-ready)
+- [x] **Étape 8 — Observabilité**
+  - [x] Spring Actuator : `/actuator/health` et `/actuator/info` publics
+        (avec build-info via `spring-boot-maven-plugin`), `/actuator/metrics`
+        et `/actuator/prometheus` réservés `ROLE_ADMIN`
+  - [x] Logs structurés : `logback-spring.xml` avec profil dev (pattern
+        lisible + id de corrélation) vs profil prod (JSON via
+        `logstash-logback-encoder`) ; `RequestIdFilter` associe un id
+        unique à chaque requête (repris de `X-Request-Id` si fourni par un
+        proxy amont, sinon généré), placé en MDC et renvoyé dans la réponse
+  - [x] Métriques Prometheus-ready via `micrometer-registry-prometheus`
+  - [x] ✅ Vérifié : health/info accessibles sans auth, metrics/prometheus
+        bloqués sans token (403) puis accessibles en ADMIN, header
+        `X-Request-Id` bien renvoyé sur chaque réponse
 - [ ] **Étape 9 — Qualité**
   - [ ] Tests unitaires (services)
   - [ ] Tests d'intégration (Testcontainers + Postgres)

@@ -37,7 +37,7 @@ public class SecurityConfig {
     private static final String[] PUBLIC_ENDPOINTS = {
         "/api/auth/**",
         "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**",
-        "/actuator/health"
+        "/actuator/health", "/actuator/health/**", "/actuator/info"
     };
 
     /** Lecture publique du catalogue — les écritures restent verrouillées via @PreAuthorize côté controller. */
@@ -58,6 +58,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
+                        // metrics/prometheus exposent des détails d'infra : réservés aux admins.
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

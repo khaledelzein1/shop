@@ -46,3 +46,23 @@ app:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # health/info publics (voir SecurityConfig) ; le reste (metrics,
+        # prometheus) est réservé aux admins — pas de fuite de détails
+        # d'infra vers des utilisateurs non authentifiés.
+        include: health, info, metrics, prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Shop API
+    description: API e-commerce multi-catégories (monolithe modulaire)
