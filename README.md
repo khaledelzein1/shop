@@ -58,4 +58,12 @@ Pour tester la pile complète conteneurisée (proche prod), voir
 
 ## État du projet
 
-🚧 En cours de construction — voir la [roadmap](docs/ROADMAP.md) pour l'avancement.
+✅ **MVP complet** (étapes 0 à 10 de la [roadmap](docs/ROADMAP.md)) : auth JWT
+avec refresh token, catalogue avec recherche full-text, panier, checkout,
+espace admin complet, DevOps (Docker/CI), observabilité, tests, lint, rate
+limiting, cache. Voir la [roadmap](docs/ROADMAP.md) pour le détail de
+chaque étape et les compromis assumés.
+
+Reste : déploiement cloud (nécessite un choix de service externe), le
+repo n'est pas encore poussé sur GitHub, et les fonctionnalités V2
+(wishlist, avis produits, promotions).
