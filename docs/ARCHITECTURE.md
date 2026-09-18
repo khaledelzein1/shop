@@ -12,6 +12,17 @@ JDK 21 (ex. Corretto 21, Temurin 21) évite ce genre de désagrément avec
 les outils qui n'ont pas toujours immédiatement supporté les JDK les
 plus récents.
 
+**Tests d'intégration (`mvn verify`) et Docker Desktop sur Windows** : les
+tests `*IT` (Testcontainers) peuvent échouer avec `Could not find a valid
+Docker environment` même quand `docker` fonctionne très bien en ligne de
+commande — Docker Desktop expose un named pipe (`npipe:////./pipe/...`)
+que le client Docker interne de Testcontainers ne négocie pas toujours
+correctement selon la version. `mvn test` (unitaires, Surefire) n'est pas
+concerné, ne nécessite pas Docker. Voir la note détaillée dans
+`docs/ROADMAP.md` (étape 9) pour ce qui a été essayé sans succès sur cette
+machine — non bloquant : ces tests tournent nativement sur les runners
+Linux de la CI.
+
 ## 1. Monolithe modulaire (pas de microservices)
 
 **Décision** : un seul déployable Spring Boot, découpé en modules métier internes.

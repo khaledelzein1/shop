@@ -139,11 +139,45 @@ tout le projet d'un coup.
   - [x] ✅ Vérifié : health/info accessibles sans auth, metrics/prometheus
         bloqués sans token (403) puis accessibles en ADMIN, header
         `X-Request-Id` bien renvoyé sur chaque réponse
-- [ ] **Étape 9 — Qualité**
-  - [ ] Tests unitaires (services)
-  - [ ] Tests d'intégration (Testcontainers + Postgres)
+- [ ] **Étape 9 — Qualité** (tests faits, lint et doc OpenAPI restants)
+  - [x] Tests unitaires backend (JUnit 5 + Mockito) : `AuthServiceTest`,
+        `CartServiceTest`, `OrderServiceTest` — logique métier clé (hash de
+        mot de passe + rôle à l'inscription, refus de stock insuffisant,
+        fusion de quantité panier, machine à états de statut commande,
+        restitution de stock à l'annulation). **8/8 verts**, rapides, sans
+        Docker (`mvn test`)
+  - [x] Tests d'intégration backend (Testcontainers + vrai Postgres, MockMvc) :
+        `AuthIT` (register/login, email dupliqué, validation, accès public
+        catalogue, 403 admin sans auth) et `CheckoutIT` (parcours complet
+        panier → adresse → checkout → stock décrémenté → panier vidé →
+        historique, panier vide → 409, stock insuffisant → 409 et aucune
+        commande créée)
+  - [x] Séparation Maven standard : Surefire (`*Test.java`, phase `test`,
+        rapide, pas de Docker requis) vs Failsafe (`*IT.java`, phase
+        `verify`, Testcontainers) — `mvn test` reste utilisable au
+        quotidien même sans Docker qui tourne
+  - [x] Tests frontend (Vitest) : `AuthService` (login/logout, signals
+        `isAuthenticated`/`isAdmin`), `authGuard`/`adminGuard` (redirections),
+        `CartService` (`itemCount` calculé). **10/10 verts**
+  - [x] Jacoco (rapport de couverture backend) ; CI mise à jour pour lancer
+        les tests frontend (`ng test --watch=false`) en plus du build
+  - [ ] ⚠️ Limitation constatée : les tests d'intégration backend (`*IT`,
+        Testcontainers) ne se lancent pas depuis cette machine Windows —
+        Docker Desktop répond mais son named pipe (`npipe:////./pipe/...`)
+        renvoie une réponse HTTP 400 inattendue au client Docker de
+        Testcontainers (essayé : `DOCKER_HOST` explicite, mise à jour
+        Testcontainers 1.20.2 → 1.21.3, `~/.testcontainers.properties`,
+        exploration WSL2 — aucun n'a résolu le problème). C'est un souci
+        d'interopérabilité Windows/Docker Desktop connu, pas un défaut du
+        code : `mvn verify` (CI, runners Linux) devrait fonctionner
+        nativement puisque c'est l'environnement de référence de
+        Testcontainers, **mais ceci n'a pas encore été vérifié
+        empiriquement** faute de remote GitHub configuré sur ce repo. À
+        confirmer dès qu'un remote existe et qu'un premier push déclenche
+        la CI.
   - [ ] Lint (Checkstyle/Spotless backend, ESLint frontend)
-  - [ ] Documentation OpenAPI/Swagger
+  - [ ] Documentation OpenAPI/Swagger (au-delà de l'exposition Swagger UI
+        déjà en place depuis l'étape 2 — descriptions/exemples détaillés)
 - [ ] **Étape 10 — Polish production-ready**
   - [ ] Rate limiting, cache, refresh token rotation
   - [ ] Amélioration pagination/recherche (ex. full-text search)
