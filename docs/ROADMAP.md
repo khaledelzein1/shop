@@ -7,12 +7,16 @@ tout le projet d'un coup.
   - [x] Choix d'architecture (monolithe modulaire, package-by-feature)
   - [x] Modèle de domaine MVP / V2
   - [x] Structure du repo, `.gitignore`, README
-- [ ] **Étape 1 — Squelette backend**
-  - [ ] Projet Maven Spring Boot (Java 21)
-  - [ ] Config PostgreSQL + Flyway
-  - [ ] `BaseEntity`, entités MVP (`User`, `Role`, `Category`, `Product`,
+- [x] **Étape 1 — Squelette backend**
+  - [x] Projet Maven Spring Boot (Java 21) — code compilé et validé (voir note JDK ci-dessous)
+  - [x] Config PostgreSQL + Flyway (`application.yml`, `db/migration/V1__init_schema.sql`)
+  - [x] `BaseEntity`, entités MVP (`User`, `Role`, `Category`, `Product`,
         `ProductVariant`, `ProductImage`)
-  - [ ] Première migration Flyway + démarrage local (Docker Compose Postgres)
+  - [x] `docker-compose.yml` Postgres local (`docker/docker-compose.yml`)
+  - [ ] ⚠️ Démarrage local complet non vérifié de bout en bout : JDK 21 pas
+        encore installé sur la machine (compilation validée avec
+        `-Dmaven.compiler.release=17` en attendant) et Docker Desktop pas
+        lancé au moment du test. À revalider dès que les deux sont prêts.
 - [ ] **Étape 2 — Sécurité**
   - [ ] Spring Security + JWT (login, register, refresh)
   - [ ] Rôles USER / ADMIN, endpoints protégés
