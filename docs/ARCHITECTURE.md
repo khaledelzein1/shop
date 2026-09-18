@@ -137,7 +137,37 @@ ne contient ni variantes ni images — elles ont leurs propres endpoints
 logique de diff complexe (ajout/suppression/mise à jour en un seul PUT) et
 colle à un modèle REST plus simple : un sous-endpoint par sous-ressource.
 
-## 8. Frontend
+## 9. Panier, checkout et historique — convention `/api/me/**`
+
+**Convention d'URL** : toutes les ressources qui appartiennent à
+l'utilisateur connecté (adresses, panier, commandes) sont exposées sous
+`/api/me/...` plutôt que par id dans l'URL (`/api/users/{id}/cart`). L'id
+vient toujours du token JWT (`@AuthenticationPrincipal`), jamais d'un
+paramètre — impossible pour un utilisateur de manipuler le panier ou les
+commandes d'un autre en changeant un id dans l'URL.
+
+**Panier créé à la volée** : pas d'endpoint `POST /api/me/cart` — le
+panier est créé automatiquement au premier ajout d'article
+(`CartService.getOrCreateCart`). Une ligne panier par variante ; ajouter
+une variante déjà présente incrémente la quantité plutôt que de dupliquer
+la ligne (contrainte unique `(cart_id, variant_id)` en base pour le
+garantir aussi côté données).
+
+**Checkout simulé → statut `CONFIRMED` immédiat** : sans vraie passerelle
+de paiement, un statut `PENDING` initial n'aurait de sens que pour
+représenter une attente de confirmation de paiement — absente ici. Le
+checkout va donc directement à `CONFIRMED` après validation du stock. Le
+stock, lui, est réellement décrémenté (pas simulé) : c'est la partie
+métier qu'on veut démontrer proprement. Les transitions suivantes
+(`SHIPPED`, `DELIVERED`, `CANCELLED`) seront pilotées par l'admin
+(étape 5).
+
+**Adresse de livraison** : le checkout référence une adresse existante du
+carnet d'adresses de l'utilisateur (`addressId`) plutôt que de ressaisir
+les champs — cohérent avec la fonctionnalité "gestion des adresses" et
+évite de dupliquer la validation des champs d'adresse dans deux DTO.
+
+## 10. Frontend
 
 Angular avec architecture par feature modules (`core/`, `shared/`,
 `features/auth`, `features/catalog`, `features/cart`, `features/checkout`,

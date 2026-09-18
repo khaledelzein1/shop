@@ -1,0 +1,98 @@
+package com.shop.order;
+
+import com.shop.address.Address;
+import com.shop.address.AddressRepository;
+import com.shop.cart.Cart;
+import com.shop.cart.CartItem;
+import com.shop.cart.CartRepository;
+import com.shop.catalog.ProductVariant;
+import com.shop.common.dto.PageResponse;
+import com.shop.common.exception.ConflictException;
+import com.shop.common.exception.ResourceNotFoundException;
+import com.shop.order.dto.CheckoutRequest;
+import com.shop.order.dto.OrderResponse;
+import com.shop.order.dto.OrderSummaryResponse;
+import com.shop.user.UserRepository;
+import java.math.BigDecimal;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Checkout "simulé" : pas de vraie passerelle de paiement, mais le stock est
+ * réellement vérifié et décrémenté, et la commande créée devient tout de
+ * suite CONFIRMED (pas d'étape PENDING qui n'aurait de sens qu'en attente
+ * d'une confirmation de paiement réelle — voir docs/ARCHITECTURE.md).
+ */
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
+    private final AddressRepository addressRepository;
+    private final UserRepository userRepository;
+
+    @Transactional
+    public OrderResponse checkout(Long userId, CheckoutRequest request) {
+        Cart cart = cartRepository.findByUserId(userId)
+                .filter(c -> !c.getItems().isEmpty())
+                .orElseThrow(() -> new ConflictException("Le panier est vide"));
+
+        Address address = addressRepository.findByIdAndUserId(request.addressId(), userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Adresse introuvable (id=" + request.addressId() + ")"));
+
+        for (CartItem cartItem : cart.getItems()) {
+            ProductVariant variant = cartItem.getVariant();
+            if (!variant.isActive() || variant.getStock() < cartItem.getQuantity()) {
+                throw new ConflictException(
+                        "Stock insuffisant pour '" + variant.getSku() + "' — vérifiez votre panier avant de commander");
+            }
+        }
+
+        Order order = new Order();
+        order.setUser(userRepository.getReferenceById(userId));
+        order.setStatus(OrderStatus.CONFIRMED);
+        order.setShippingLabel(address.getLabel());
+        order.setShippingStreet(address.getStreet());
+        order.setShippingCity(address.getCity());
+        order.setShippingZipCode(address.getZipCode());
+        order.setShippingCountry(address.getCountry());
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (CartItem cartItem : cart.getItems()) {
+            ProductVariant variant = cartItem.getVariant();
+            variant.setStock(variant.getStock() - cartItem.getQuantity());
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setVariant(variant);
+            orderItem.setProductName(variant.getProduct().getName());
+            orderItem.setSku(variant.getSku());
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setUnitPrice(cartItem.getUnitPriceSnapshot());
+            order.getItems().add(orderItem);
+
+            total = total.add(cartItem.getUnitPriceSnapshot().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+        }
+        order.setTotalAmount(total);
+
+        Order saved = orderRepository.save(order);
+        cart.getItems().clear();
+
+        return OrderResponse.from(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<OrderSummaryResponse> history(Long userId, Pageable pageable) {
+        return PageResponse.from(orderRepository.findByUserId(userId, pageable).map(OrderSummaryResponse::from));
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getOrderForUser(Long userId, Long orderId) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Commande introuvable (id=" + orderId + ")"));
+        return OrderResponse.from(order);
+    }
+}

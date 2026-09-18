@@ -40,10 +40,19 @@ tout le projet d'un coup.
         2 produits avec variantes JSONB (RAM/stockage, taille/couleur) et images
   - [ ] ⚠️ Non vérifié de bout en bout (mêmes blocages JDK 21 / Docker Desktop
         que l'étape 2) — code compilé et relu, à valider dès que possible
-- [ ] **Étape 4 — Panier & Checkout (API)**
-  - [ ] Ajout/modification/suppression d'articles panier
-  - [ ] Checkout simulé → création de commande
-  - [ ] Historique des commandes utilisateur
+- [x] **Étape 4 — Panier & Checkout (API)**
+  - [x] Carnet d'adresses (`/api/me/addresses`) — nécessaire au checkout,
+        pas prévu comme étape backend dédiée dans la roadmap initiale mais
+        indispensable ici (une seule adresse par défaut, gérée en base)
+  - [x] Panier (`/api/me/cart`) : ajout (fusion de quantité si variante déjà
+        présente), modification, suppression — création à la volée, vérifie
+        le stock disponible à chaque opération
+  - [x] Checkout simulé (`POST /api/me/orders/checkout`) → décrémente le
+        stock, snapshotte produits/adresse, crée la commande en `CONFIRMED`
+  - [x] Historique des commandes (`GET /api/me/orders`, `GET /api/me/orders/{id}`),
+        paginé, trié par date décroissante
+  - [ ] ⚠️ Non vérifié de bout en bout (mêmes blocages JDK 21 / Docker Desktop) —
+        code compilé et relu, à valider dès que possible
 - [ ] **Étape 5 — Admin (API)**
   - [ ] Gestion commandes (changement de statut)
   - [ ] Gestion utilisateurs
