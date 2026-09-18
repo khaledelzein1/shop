@@ -13,10 +13,9 @@ tout le projet d'un coup.
   - [x] `BaseEntity`, entités MVP (`User`, `Role`, `Category`, `Product`,
         `ProductVariant`, `ProductImage`)
   - [x] `docker-compose.yml` Postgres local (`docker/docker-compose.yml`)
-  - [ ] ⚠️ Démarrage local complet non vérifié de bout en bout : JDK 21 pas
-        encore installé sur la machine (compilation validée avec
-        `-Dmaven.compiler.release=17` en attendant) et Docker Desktop pas
-        lancé au moment du test. À revalider dès que les deux sont prêts.
+  - [x] ✅ Vérifié de bout en bout le 2026-09-18 (JDK 21 Corretto + Docker
+        Desktop) : `docker compose up` + `mvn spring-boot:run`, 5 migrations
+        Flyway appliquées, démarrage propre
 - [x] **Étape 2 — Sécurité**
   - [x] Spring Security + JWT stateless (`/api/auth/register`, `/api/auth/login`) —
         pas de refresh token en MVP, expiration 24h (voir compromis dans
@@ -27,9 +26,8 @@ tout le projet d'un coup.
   - [x] Swagger UI (springdoc) avec bouton "Authorize" JWT
   - [x] Compte admin de démo auto-créé au démarrage (`AdminAccountInitializer`,
         désactivable via `SEED_ADMIN_ENABLED=false`)
-  - [ ] ⚠️ Non vérifié de bout en bout (register → login → endpoint protégé)
-        faute de JDK 21 et de Docker Desktop actifs sur la machine au moment
-        du test — code compilé et relu, à valider dès que possible
+  - [x] ✅ Vérifié de bout en bout : register (201 + token), login admin
+        (201 + token ROLE_ADMIN), accès admin refusé pour un USER (403)
 - [x] **Étape 3 — Catalogue (API)**
   - [x] CRUD catégories (`/api/categories`, lecture publique, mutation ADMIN)
   - [x] CRUD produits (`/api/admin/products`) + variantes et images
@@ -38,8 +36,13 @@ tout le projet d'un coup.
         disponibilité/texte via `Specification`, pagination + tri (`Pageable`)
   - [x] Données de démo (`V3__seed_catalog_demo_data.sql`) : 2 catégories,
         2 produits avec variantes JSONB (RAM/stockage, taille/couleur) et images
-  - [ ] ⚠️ Non vérifié de bout en bout (mêmes blocages JDK 21 / Docker Desktop
-        que l'étape 2) — code compilé et relu, à valider dès que possible
+  - [x] ✅ Vérifié de bout en bout — a révélé un vrai bug corrigé dans la
+        foulée : les GET publics `/api/categories` et `/api/products`
+        étaient bloqués (403) car non listés dans les endpoints publics du
+        `SecurityFilterChain` (seul `@PreAuthorize` protégeait les écritures,
+        mais `anyRequest().authenticated()` bloquait aussi les lectures).
+        Corrigé avec un `requestMatchers(HttpMethod.GET, ...).permitAll()`
+        dédié dans `SecurityConfig`.
 - [x] **Étape 4 — Panier & Checkout (API)**
   - [x] Carnet d'adresses (`/api/me/addresses`) — nécessaire au checkout,
         pas prévu comme étape backend dédiée dans la roadmap initiale mais
@@ -51,8 +54,10 @@ tout le projet d'un coup.
         stock, snapshotte produits/adresse, crée la commande en `CONFIRMED`
   - [x] Historique des commandes (`GET /api/me/orders`, `GET /api/me/orders/{id}`),
         paginé, trié par date décroissante
-  - [ ] ⚠️ Non vérifié de bout en bout (mêmes blocages JDK 21 / Docker Desktop) —
-        code compilé et relu, à valider dès que possible
+  - [x] ✅ Vérifié de bout en bout : ajout panier (fusion quantité), rejet
+        409 si stock insuffisant, checkout → commande `CONFIRMED`, stock
+        variante décrémenté (15→13 vérifié), panier vidé après commande,
+        historique correct
 - [ ] **Étape 5 — Admin (API)**
   - [ ] Gestion commandes (changement de statut)
   - [ ] Gestion utilisateurs

@@ -1,5 +1,17 @@
 # Décisions d'architecture
 
+## 0. Environnement de build requis
+
+**JDK 21 exactement** (pas une version plus récente comme 25 au moment de
+la rédaction) : Lombok, même en version très récente (testé jusqu'à
+1.18.38), ne patchait pas encore correctement les internals du compilateur
+d'un JDK 25 tout juste sorti — tous les getters/setters générés par
+Lombok échouaient à la compilation (`cannot find symbol`). Le projet
+cible `java.version=21` dans `backend/pom.xml` ; utiliser exactement un
+JDK 21 (ex. Corretto 21, Temurin 21) évite ce genre de désagrément avec
+les outils qui n'ont pas toujours immédiatement supporté les JDK les
+plus récents.
+
 ## 1. Monolithe modulaire (pas de microservices)
 
 **Décision** : un seul déployable Spring Boot, découpé en modules métier internes.
