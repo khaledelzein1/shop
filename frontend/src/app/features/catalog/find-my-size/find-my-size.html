@@ -1,0 +1,65 @@
+<div class="fms-page">
+  <div class="card fms-card">
+    <a routerLink="/products/jackets" class="back-link">← Back to catalog</a>
+    <h1>Find your size</h1>
+    <p class="fms-subtitle">Answer a couple of questions and we'll suggest the size that fits you best.</p>
+
+    @if (step() === 1) {
+      <form (ngSubmit)="submitMeasurements()">
+        <div class="form-field">
+          <label for="height">Height (cm)</label>
+          <input
+            id="height"
+            type="number"
+            min="120"
+            max="220"
+            placeholder="e.g. 178"
+            [ngModel]="heightCm()"
+            (ngModelChange)="heightCm.set($event)"
+            name="height"
+            required
+          />
+        </div>
+        <div class="form-field">
+          <label for="weight">Weight (kg)</label>
+          <input
+            id="weight"
+            type="number"
+            min="35"
+            max="180"
+            placeholder="e.g. 74"
+            [ngModel]="weightKg()"
+            (ngModelChange)="weightKg.set($event)"
+            name="weight"
+            required
+          />
+        </div>
+        <button type="submit" class="btn" [disabled]="!heightCm() || !weightKg()">Continue</button>
+      </form>
+    }
+
+    @if (step() === 2) {
+      <p class="fms-question">How do you like your clothes to fit?</p>
+      <div class="fms-fit-options">
+        @for (fit of fitOptions; track fit) {
+          <button type="button" class="fms-fit-option" (click)="chooseFit(fit)">{{ fit }}</button>
+        }
+      </div>
+      <button type="button" class="btn btn--secondary fms-back" (click)="step.set(1)">← Back</button>
+    }
+
+    @if (step() === 3) {
+      <div class="fms-result">
+        <span class="fms-result__label">Your recommended size</span>
+        <span class="fms-result__size">{{ recommendedSize() }}</span>
+        <p class="fms-result__note">Based on your height, weight and preferred fit. Use it as a guide.</p>
+        <div class="fms-result__actions">
+          @if (hasReturnTarget) {
+            <button type="button" class="btn" (click)="useThisSize()">Use this size</button>
+          }
+          <button type="button" class="btn btn--secondary" (click)="restart()">Start over</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

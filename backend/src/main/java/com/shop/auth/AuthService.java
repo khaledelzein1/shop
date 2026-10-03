@@ -46,7 +46,7 @@ public class AuthService {
             .orElseThrow(
                 () ->
                     new IllegalStateException(
-                        "Rôle ROLE_USER manquant en base — la migration de seed a-t-elle bien tourné ?"));
+                        "ROLE_USER role missing in database — did the seed migration run correctly?"));
 
     User user = new User();
     user.setEmail(request.email());
@@ -68,7 +68,7 @@ public class AuthService {
         userRepository
             .findByEmail(request.email())
             .orElseThrow(
-                () -> new IllegalStateException("Utilisateur authentifié introuvable en base"));
+                () -> new IllegalStateException("Authenticated user not found in database"));
 
     return buildAuthResponse(user);
   }

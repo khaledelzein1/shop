@@ -27,6 +27,7 @@ export interface ProductImage {
   url: string;
   position: number;
   primary: boolean;
+  variantId: number | null;
 }
 
 export interface Product {
@@ -71,6 +72,7 @@ export interface ProductImageRequest {
   url: string;
   position: number;
   primary: boolean;
+  variantId: number | null;
 }
 
 export interface UpdateStockRequest {

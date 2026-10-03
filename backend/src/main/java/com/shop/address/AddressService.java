@@ -63,6 +63,6 @@ public class AddressService {
     return addressRepository
         .findByIdAndUserId(addressId, userId)
         .orElseThrow(
-            () -> new ResourceNotFoundException("Adresse introuvable (id=" + addressId + ")"));
+            () -> new ResourceNotFoundException("Address not found (id=" + addressId + ")"));
   }
 }

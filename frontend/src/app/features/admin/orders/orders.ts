@@ -35,7 +35,7 @@ export class AdminOrders implements OnInit {
       next: () => this.load(),
       error: (err: HttpErrorResponse) => {
         const apiError = err.error as ApiError | undefined;
-        alert(apiError?.message ?? 'Transition de statut refusée');
+        alert(apiError?.message ?? 'Status transition refused');
         this.load();
       },
     });

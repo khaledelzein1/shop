@@ -15,6 +15,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/catalog/product-detail/product-detail').then((m) => m.ProductDetail),
   },
   {
+    path: 'find-my-size',
+    loadComponent: () => import('./features/catalog/find-my-size/find-my-size').then((m) => m.FindMySize),
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
   },

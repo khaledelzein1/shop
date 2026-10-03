@@ -36,7 +36,7 @@ public class ProductService {
         productRepository
             .findBySlugAndActiveTrue(slug)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Produit introuvable (slug=" + slug + ")"));
+                () -> new ResourceNotFoundException("Product not found (slug=" + slug + ")"));
     return ProductResponse.from(product);
   }
 
@@ -82,7 +82,7 @@ public class ProductService {
   @Transactional
   public ProductResponse create(ProductRequest request) {
     if (productRepository.existsBySlug(request.slug())) {
-      throw new ConflictException("Un produit existe déjà avec le slug : " + request.slug());
+      throw new ConflictException("A product already exists with slug: " + request.slug());
     }
     Category category =
         categoryRepository
@@ -90,7 +90,7 @@ public class ProductService {
             .orElseThrow(
                 () ->
                     new ResourceNotFoundException(
-                        "Catégorie introuvable (id=" + request.categoryId() + ")"));
+                        "Category not found (id=" + request.categoryId() + ")"));
 
     Product product = new Product();
     applyRequest(product, request, category);
@@ -102,7 +102,7 @@ public class ProductService {
     Product product = findByIdOrThrow(id);
     if (!product.getSlug().equals(request.slug())
         && productRepository.existsBySlug(request.slug())) {
-      throw new ConflictException("Un produit existe déjà avec le slug : " + request.slug());
+      throw new ConflictException("A product already exists with slug: " + request.slug());
     }
     Category category =
         categoryRepository
@@ -110,7 +110,7 @@ public class ProductService {
             .orElseThrow(
                 () ->
                     new ResourceNotFoundException(
-                        "Catégorie introuvable (id=" + request.categoryId() + ")"));
+                        "Category not found (id=" + request.categoryId() + ")"));
 
     applyRequest(product, request, category);
     return ProductResponse.from(product);
@@ -146,6 +146,6 @@ public class ProductService {
   Product findByIdOrThrow(Long id) {
     return productRepository
         .findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Produit introuvable (id=" + id + ")"));
+        .orElseThrow(() -> new ResourceNotFoundException("Product not found (id=" + id + ")"));
   }
 }

@@ -69,10 +69,11 @@ export class AdminProductForm implements OnInit {
     attributes: [''],
   });
 
-  protected readonly imageForm = this.fb.nonNullable.group({
-    url: ['', Validators.required],
-    position: [0],
-    primary: [false],
+  protected readonly imageForm = this.fb.group({
+    url: this.fb.nonNullable.control('', Validators.required),
+    position: this.fb.nonNullable.control(0),
+    primary: this.fb.nonNullable.control(false),
+    variantId: this.fb.control<number | null>(null),
   });
 
   ngOnInit(): void {
@@ -130,7 +131,7 @@ export class AdminProductForm implements OnInit {
       error: (err: HttpErrorResponse) => {
         this.saving.set(false);
         const apiError = err.error as ApiError | undefined;
-        this.errorMessage.set(apiError?.message ?? 'Une erreur est survenue');
+        this.errorMessage.set(apiError?.message ?? 'An error occurred');
       },
     });
   }
@@ -162,7 +163,7 @@ export class AdminProductForm implements OnInit {
         },
         error: (err: HttpErrorResponse) => {
           const apiError = err.error as ApiError | undefined;
-          alert(apiError?.message ?? 'Erreur lors de la création de la variante');
+          alert(apiError?.message ?? 'Error creating the variant');
         },
       });
   }
@@ -177,14 +178,14 @@ export class AdminProductForm implements OnInit {
 
   deleteVariant(variantId: number): void {
     const id = this.productId();
-    if (!id || !confirm('Supprimer cette variante ?')) {
+    if (!id || !confirm('Delete this variant?')) {
       return;
     }
     this.productService.deleteVariant(id, variantId).subscribe(() => this.loadProduct(id));
   }
 
   toggleImageForm(): void {
-    this.imageForm.reset({ url: '', position: 0, primary: false });
+    this.imageForm.reset({ url: '', position: 0, primary: false, variantId: null });
     this.showImageForm.set(!this.showImageForm());
   }
 
@@ -194,17 +195,25 @@ export class AdminProductForm implements OnInit {
       this.imageForm.markAllAsTouched();
       return;
     }
-    this.productService.addImage(id, this.imageForm.getRawValue()).subscribe({
-      next: () => {
-        this.showImageForm.set(false);
-        this.loadProduct(id);
-      },
-    });
+    const raw = this.imageForm.getRawValue();
+    this.productService
+      .addImage(id, {
+        url: raw.url,
+        position: raw.position,
+        primary: raw.primary,
+        variantId: raw.variantId,
+      })
+      .subscribe({
+        next: () => {
+          this.showImageForm.set(false);
+          this.loadProduct(id);
+        },
+      });
   }
 
   deleteImage(imageId: number): void {
     const id = this.productId();
-    if (!id || !confirm('Supprimer cette image ?')) {
+    if (!id || !confirm('Delete this image?')) {
       return;
     }
     this.productService.deleteImage(id, imageId).subscribe(() => this.loadProduct(id));

@@ -8,6 +8,6 @@ public record CategoryRequest(
     @NotBlank
         @Pattern(
             regexp = "^[a-z0-9]+(-[a-z0-9]+)*$",
-            message = "Le slug doit être en minuscules, sans espaces (ex: materiel-informatique)")
+            message = "Slug must be lowercase, with no spaces (e.g. hardware-computers)")
         String slug,
     String description) {}

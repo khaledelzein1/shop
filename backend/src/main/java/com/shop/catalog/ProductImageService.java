@@ -13,13 +13,14 @@ public class ProductImageService {
 
   private final ProductImageRepository imageRepository;
   private final ProductService productService;
+  private final ProductVariantRepository variantRepository;
 
   @Transactional
   public ProductImageResponse create(Long productId, ProductImageRequest request) {
     Product product = productService.findByIdOrThrow(productId);
 
     ProductImage image = new ProductImage();
-    applyRequest(image, request);
+    applyRequest(image, request, productId);
     image.setProduct(product);
     product.getImages().add(image);
 
@@ -29,7 +30,7 @@ public class ProductImageService {
   @Transactional
   public ProductImageResponse update(Long productId, Long imageId, ProductImageRequest request) {
     ProductImage image = findByIdAndProductOrThrow(imageId, productId);
-    applyRequest(image, request);
+    applyRequest(image, request, productId);
     return ProductImageResponse.from(image);
   }
 
@@ -40,10 +41,25 @@ public class ProductImageService {
     imageRepository.delete(image);
   }
 
-  private void applyRequest(ProductImage image, ProductImageRequest request) {
+  private void applyRequest(ProductImage image, ProductImageRequest request, Long productId) {
     image.setUrl(request.url());
     image.setPosition(request.position());
     image.setPrimary(request.primary());
+    if (request.variantId() != null) {
+      ProductVariant variant =
+          variantRepository
+              .findByIdAndProductId(request.variantId(), productId)
+              .orElseThrow(
+                  () ->
+                      new ResourceNotFoundException(
+                          "Variant not found (id="
+                              + request.variantId()
+                              + ") for product "
+                              + productId));
+      image.setVariant(variant);
+    } else {
+      image.setVariant(null);
+    }
   }
 
   private ProductImage findByIdAndProductOrThrow(Long imageId, Long productId) {
@@ -52,6 +68,6 @@ public class ProductImageService {
         .orElseThrow(
             () ->
                 new ResourceNotFoundException(
-                    "Image introuvable (id=" + imageId + ") pour le produit " + productId));
+                    "Image not found (id=" + imageId + ") for product " + productId));
   }
 }

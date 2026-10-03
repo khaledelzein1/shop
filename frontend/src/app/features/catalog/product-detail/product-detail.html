@@ -1,71 +1,254 @@
 @if (loading()) {
-  <p>Chargement...</p>
+  <p>Loading...</p>
 } @else if (product(); as p) {
-  <div class="product-detail">
-    <div class="product-detail__gallery">
-      @if (p.images.length > 0) {
-        <img [src]="p.images[0].url" [alt]="p.name" />
-      } @else {
-        <img src="https://placehold.co/500x500?text=Shop" [alt]="p.name" />
-      }
-    </div>
+  @if (modelGroups(); as models) {
+    @if (models.length > 1) {
+      <div class="model-catalog">
+        <a routerLink="/products" class="back-link">← Back to catalog</a>
+        <p class="product-detail__brand">{{ p.brand }} · {{ p.category.name }}</p>
+        <h1>{{ p.name }}</h1>
+        <p class="product-detail__description">{{ p.description }}</p>
 
-    <div class="product-detail__info">
-      <a routerLink="/products" class="back-link">← Retour au catalogue</a>
-      <p class="product-detail__brand">{{ p.brand }} · {{ p.category.name }}</p>
-      <h1>{{ p.name }}</h1>
-      <p class="product-detail__description">{{ p.description }}</p>
-
-      @if (selectedVariant(); as variant) {
-        <p class="product-detail__price">{{ variant.price | number: "1.2-2" }} €</p>
-      }
-
-      <div class="variant-picker">
-        <span class="variant-picker__label">Variante</span>
-        <div class="variant-picker__options">
-          @for (variant of p.variants; track variant.id) {
-            <button
-              type="button"
-              class="variant-chip"
-              [class.is-selected]="selectedVariant()?.id === variant.id"
-              [disabled]="!variant.active || variant.stock === 0"
-              (click)="selectVariant(variant)"
-            >
-              @for (attr of variant.attributes | keyvalue; track attr.key) {
-                {{ attr.value }}
+        @if (fitGroups().length > 1) {
+          @if (selectedFit() === null) {
+            <div class="fit-tiles">
+              @for (fitGroup of fitGroups(); track fitGroup.fit) {
+                @let tileImage = fitTileImage(fitGroup.fit, fitGroup.models);
+                <button type="button" class="fit-tile" (click)="selectFit(fitGroup.fit)">
+                  <div class="fit-tile__photo">
+                    @if (tileImage) {
+                      <img [src]="tileImage.url" [alt]="fitGroup.fit" />
+                    } @else {
+                      <img src="https://placehold.co/400x400?text=Shop" [alt]="fitGroup.fit" />
+                    }
+                  </div>
+                  <span class="fit-tile__name">{{ fitGroup.fit }}</span>
+                  <span class="fit-tile__count">{{ fitGroup.models.length }} styles</span>
+                </button>
               }
-              @if (variant.stock === 0) {
-                (rupture)
+            </div>
+          } @else {
+            <button type="button" class="back-link fit-back" (click)="backToFits()">← All fits</button>
+            <h2 class="fit-heading">{{ selectedFit() }}</h2>
+            <div class="model-grid">
+              @for (group of activeFitModels(); track group.name) {
+                <ng-container *ngTemplateOutlet="modelCard; context: { $implicit: group }" />
               }
-            </button>
+            </div>
+          }
+        } @else {
+          <div class="model-grid">
+            @for (group of displayedModelGroups(); track group.name) {
+              <ng-container *ngTemplateOutlet="modelCard; context: { $implicit: group }" />
+            }
+          </div>
+        }
+
+        <ng-template #modelCard let-group>
+          @let variant = cardVariant(group.name, group.variants);
+          @let image = cardImage(group.name, variant);
+          @let images = cardImages(variant);
+          <div class="model-card">
+            <div class="model-card__photo">
+              @if (image) {
+                <img [src]="image.url" [alt]="group.name" />
+              } @else {
+                <img src="https://placehold.co/400x400?text=Shop" [alt]="group.name" />
+              }
+              @if (images.length > 1) {
+                <div class="model-card__gallery-dots">
+                  @for (img of images; track img.id; let i = $index) {
+                    <button
+                      type="button"
+                      class="gallery-dot"
+                      [class.is-selected]="image?.id === img.id"
+                      [attr.aria-label]="'Photo ' + (i + 1)"
+                      (click)="selectCardImage(group.name, i)"
+                    ></button>
+                  }
+                </div>
+              }
+            </div>
+            <div class="model-card__header">
+              <span class="model-card__name">{{ group.name }}</span>
+              <div class="model-card__add-wrap">
+                <button
+                  type="button"
+                  class="model-card__add"
+                  [disabled]="!variant || variant.stock === 0"
+                  (click)="onQuickAddClick(group.name, variant, availableSizes(group.variants))"
+                  aria-label="Add to cart"
+                >
+                  +
+                </button>
+                @if (sizePickerOpen() === group.name) {
+                  <div class="size-picker">
+                    <span class="size-picker__label">Choose a size</span>
+                    @for (size of availableSizes(group.variants); track size) {
+                      <button type="button" class="size-picker__option" (click)="chooseSizeAndAdd(group.name, group.variants, size)">
+                        {{ size }}
+                      </button>
+                    }
+                    @if (p.slug !== 'shoes') {
+                      <a
+                        class="size-picker__find-link"
+                        routerLink="/find-my-size"
+                        [queryParams]="{ model: group.name, product: p.slug, sizes: availableSizes(group.variants).join(',') }"
+                      >
+                        Find your size
+                      </a>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            <span class="model-card__price">{{ group.variants[0].price | number: "1.2-2" }} €</span>
+            @if (uniqueColorVariants(group.variants).length > 1) {
+              <div class="model-card__swatches">
+                @for (v of uniqueColorVariants(group.variants); track v.attributes['color']) {
+                  <button
+                    type="button"
+                    class="swatch"
+                    [class.swatch--black]="v.attributes['color'] === 'Black'"
+                    [class.swatch--white]="v.attributes['color'] === 'White'"
+                    [class.swatch--red]="v.attributes['color'] === 'Red'"
+                    [class.swatch--off-white]="v.attributes['color'] === 'Off-White'"
+                    [class.swatch--blue]="v.attributes['color'] === 'Blue'"
+                    [class.swatch--dark-blue]="v.attributes['color'] === 'Dark Blue'"
+                    [class.swatch--light-blue]="v.attributes['color'] === 'Light Blue'"
+                    [class.swatch--brown]="v.attributes['color'] === 'Brown'"
+                    [class.swatch--olive]="v.attributes['color'] === 'Olive'"
+                    [class.swatch--green]="v.attributes['color'] === 'Green'"
+                    [class.swatch--beige]="v.attributes['color'] === 'Beige'"
+                    [class.swatch--blue-gray]="v.attributes['color'] === 'Blue Gray'"
+                    [class.is-selected]="variant?.attributes?.['color'] === v.attributes['color']"
+                    [disabled]="!colorInStock(group.variants, v.attributes['color'])"
+                    [attr.aria-label]="v.attributes['color']"
+                    [title]="v.attributes['color']"
+                    (click)="previewCardColor(group.name, v.attributes['color'])"
+                  ></button>
+                }
+              </div>
+            }
+            @if (cardAddedFeedback() === group.name) {
+              <span class="model-card__feedback">Added ✓</span>
+            }
+          </div>
+        </ng-template>
+      </div>
+    } @else {
+      <div class="product-detail">
+        <div class="product-detail__gallery">
+          @if (displayedImage(); as image) {
+            <img [src]="image.url" [alt]="p.name" />
+          } @else {
+            <img src="https://placehold.co/500x500?text=Shop" [alt]="p.name" />
+          }
+        </div>
+
+        <div class="product-detail__info">
+          <a routerLink="/products" class="back-link">← Back to catalog</a>
+          <p class="product-detail__brand">{{ p.brand }} · {{ p.category.name }}</p>
+          <h1>{{ p.name }}</h1>
+          <p class="product-detail__description">{{ p.description }}</p>
+
+          @if (selectedVariant(); as variant) {
+            <p class="product-detail__price">{{ variant.price | number: "1.2-2" }} €</p>
+          }
+
+          @if (otherVariants(); as variants) {
+            @if (variants.length > 0) {
+              <div class="variant-picker">
+                <span class="variant-picker__label">Variant</span>
+                <div class="variant-picker__options">
+                  @for (variant of variants; track variant.id) {
+                    <button
+                      type="button"
+                      class="variant-chip"
+                      [class.is-selected]="selectedVariant()?.id === variant.id"
+                      [disabled]="!variant.active || variant.stock === 0"
+                      (click)="selectVariant(variant)"
+                    >
+                      @for (attr of variant.attributes | keyvalue; track attr.key) {
+                        {{ attr.value }}
+                      }
+                      @if (variant.stock === 0) {
+                        (out of stock)
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          }
+
+          @if (colorVariants(); as colors) {
+            @if (colors.length > 0) {
+              <div class="variant-picker">
+                <span class="variant-picker__label" id="color-label">Color</span>
+                <div class="custom-select" [class.is-open]="colorDropdownOpen()">
+                  <button
+                    type="button"
+                    class="custom-select__trigger"
+                    aria-haspopup="listbox"
+                    aria-labelledby="color-label"
+                    [attr.aria-expanded]="colorDropdownOpen()"
+                    (click)="toggleColorDropdown()"
+                  >
+                    <span>{{ selectedVariant()?.attributes?.["color"] ?? "Choose" }}</span>
+                    <span class="custom-select__arrow" aria-hidden="true"></span>
+                  </button>
+                  @if (colorDropdownOpen()) {
+                    <ul class="custom-select__panel" role="listbox">
+                      @for (variant of colors; track variant.id) {
+                        <li role="option" [attr.aria-selected]="selectedVariant()?.id === variant.id">
+                          <button
+                            type="button"
+                            class="custom-select__option"
+                            [class.is-selected]="selectedVariant()?.id === variant.id"
+                            [disabled]="!variant.active || variant.stock === 0"
+                            (click)="selectVariant(variant); colorDropdownOpen.set(false)"
+                          >
+                            {{ variant.attributes["color"] }}
+                            @if (variant.stock === 0) {
+                              (out of stock)
+                            }
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+              </div>
+            }
+          }
+
+          @if (selectedVariant(); as variant) {
+            <p class="product-detail__stock">{{ variant.stock }} in stock (SKU {{ variant.sku }})</p>
+
+            @if (variant.stock > 0) {
+              <div class="add-to-cart">
+                <input
+                  type="number"
+                  min="1"
+                  [max]="variant.stock"
+                  [ngModel]="quantity()"
+                  (ngModelChange)="quantity.set($event)"
+                />
+                <button type="button" class="btn" [disabled]="addingToCart()" (click)="addToCart()">
+                  {{ addingToCart() ? "Adding..." : "Add to cart" }}
+                </button>
+              </div>
+
+              @if (addedMessage()) {
+                <p class="alert alert--success">Added to cart!</p>
+              }
+            } @else {
+              <button type="button" class="btn" disabled>Out of stock</button>
+            }
           }
         </div>
       </div>
-
-      @if (selectedVariant(); as variant) {
-        <p class="product-detail__stock">{{ variant.stock }} en stock (SKU {{ variant.sku }})</p>
-
-        @if (variant.stock > 0) {
-          <div class="add-to-cart">
-            <input
-              type="number"
-              min="1"
-              [max]="variant.stock"
-              [ngModel]="quantity()"
-              (ngModelChange)="quantity.set($event)"
-            />
-            <button type="button" class="btn" [disabled]="addingToCart()" (click)="addToCart()">
-              {{ addingToCart() ? "Ajout..." : "Ajouter au panier" }}
-            </button>
-          </div>
-
-          @if (addedMessage()) {
-            <p class="alert alert--success">Ajouté au panier !</p>
-          }
-        } @else {
-          <button type="button" class="btn" disabled>Rupture de stock</button>
-        }
-      }
-    </div>
-  </div>
+    }
+  }
 }

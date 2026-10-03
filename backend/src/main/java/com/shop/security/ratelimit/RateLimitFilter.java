@@ -92,7 +92,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             Instant.now(),
             HttpStatus.TOO_MANY_REQUESTS.value(),
             HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase(),
-            "Trop de tentatives, réessaie dans quelques instants",
+            "Too many attempts, please try again shortly",
             path,
             null);
     response.getWriter().write(objectMapper.writeValueAsString(error));

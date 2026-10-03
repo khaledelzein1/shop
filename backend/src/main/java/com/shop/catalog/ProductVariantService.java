@@ -20,7 +20,7 @@ public class ProductVariantService {
   public ProductVariantResponse create(Long productId, ProductVariantRequest request) {
     Product product = productService.findByIdOrThrow(productId);
     if (variantRepository.existsBySku(request.sku())) {
-      throw new ConflictException("Une variante existe déjà avec le SKU : " + request.sku());
+      throw new ConflictException("A variant already exists with SKU: " + request.sku());
     }
 
     ProductVariant variant = new ProductVariant();
@@ -36,7 +36,7 @@ public class ProductVariantService {
       Long productId, Long variantId, ProductVariantRequest request) {
     ProductVariant variant = findByIdAndProductOrThrow(variantId, productId);
     if (!variant.getSku().equals(request.sku()) && variantRepository.existsBySku(request.sku())) {
-      throw new ConflictException("Une variante existe déjà avec le SKU : " + request.sku());
+      throw new ConflictException("A variant already exists with SKU: " + request.sku());
     }
     applyRequest(variant, request);
     return ProductVariantResponse.from(variant);
@@ -73,6 +73,6 @@ public class ProductVariantService {
         .orElseThrow(
             () ->
                 new ResourceNotFoundException(
-                    "Variante introuvable (id=" + variantId + ") pour le produit " + productId));
+                    "Variant not found (id=" + variantId + ") for product " + productId));
   }
 }

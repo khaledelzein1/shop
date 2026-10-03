@@ -55,7 +55,7 @@ export class CheckoutPage implements OnInit {
       error: (err: HttpErrorResponse) => {
         this.submitting.set(false);
         const apiError = err.error as ApiError | undefined;
-        this.errorMessage.set(apiError?.message ?? 'Une erreur est survenue lors de la commande');
+        this.errorMessage.set(apiError?.message ?? 'An error occurred while placing the order');
       },
     });
   }

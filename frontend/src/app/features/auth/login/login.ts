@@ -40,7 +40,7 @@ export class Login {
       error: (err: HttpErrorResponse) => {
         this.loading.set(false);
         const apiError = err.error as ApiError | undefined;
-        this.errorMessage.set(apiError?.message ?? 'Une erreur est survenue');
+        this.errorMessage.set(apiError?.message ?? 'An error occurred');
       },
     });
   }

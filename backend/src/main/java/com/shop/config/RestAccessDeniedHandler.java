@@ -36,7 +36,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
             Instant.now(),
             HttpStatus.FORBIDDEN.value(),
             HttpStatus.FORBIDDEN.getReasonPhrase(),
-            "Accès refusé",
+            "Access denied",
             request.getRequestURI(),
             null);
     response.getWriter().write(objectMapper.writeValueAsString(error));

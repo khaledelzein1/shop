@@ -1,6 +1,6 @@
 <div class="admin-header">
-  <h1>Catégories</h1>
-  <button type="button" class="btn" (click)="startCreate()">+ Nouvelle catégorie</button>
+  <h1>Categories</h1>
+  <button type="button" class="btn" (click)="startCreate()">+ New category</button>
 </div>
 
 @if (errorMessage()) {
@@ -10,31 +10,31 @@
 @if (editingId() !== null) {
   <form [formGroup]="form" (ngSubmit)="submit()" class="card admin-form">
     <div class="form-field">
-      <label for="name">Nom</label>
+      <label for="name">Name</label>
       <input id="name" type="text" formControlName="name" />
     </div>
     <div class="form-field">
       <label for="slug">Slug</label>
-      <input id="slug" type="text" formControlName="slug" placeholder="ex: informatique" />
+      <input id="slug" type="text" formControlName="slug" placeholder="e.g. computers" />
     </div>
     <div class="form-field">
       <label for="description">Description</label>
       <textarea id="description" formControlName="description" rows="2"></textarea>
     </div>
     <div class="form-actions">
-      <button type="submit" class="btn">Enregistrer</button>
-      <button type="button" class="btn btn--secondary" (click)="cancel()">Annuler</button>
+      <button type="submit" class="btn">Save</button>
+      <button type="button" class="btn btn--secondary" (click)="cancel()">Cancel</button>
     </div>
   </form>
 }
 
 @if (loading()) {
-  <p>Chargement...</p>
+  <p>Loading...</p>
 } @else {
   <table class="data-table">
     <thead>
       <tr>
-        <th>Nom</th>
+        <th>Name</th>
         <th>Slug</th>
         <th>Description</th>
         <th></th>
@@ -47,8 +47,8 @@
           <td>{{ cat.slug }}</td>
           <td>{{ cat.description }}</td>
           <td>
-            <button type="button" class="link-btn" (click)="startEdit(cat)">Modifier</button>
-            <button type="button" class="link-btn link-btn--danger" (click)="delete(cat.id)">Supprimer</button>
+            <button type="button" class="link-btn" (click)="startEdit(cat)">Edit</button>
+            <button type="button" class="link-btn link-btn--danger" (click)="delete(cat.id)">Delete</button>
           </td>
         </tr>
       }

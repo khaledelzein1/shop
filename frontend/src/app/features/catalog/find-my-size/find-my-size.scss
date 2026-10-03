@@ -1,0 +1,86 @@
+.fms-page {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.fms-card {
+  width: 100%;
+  max-width: 420px;
+
+  h1 {
+    margin: 0.75rem 0 0.25rem;
+    font-size: 1.4rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+.fms-subtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 0 0 1.25rem;
+}
+
+.fms-question {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.fms-fit-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.fms-fit-option {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #111827;
+    background: #f3f4f6;
+  }
+}
+
+.fms-back {
+  width: 100%;
+}
+
+.fms-result {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.fms-result__label {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.fms-result__size {
+  display: block;
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0.4rem 0;
+}
+
+.fms-result__note {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin: 0 0 1.25rem;
+}
+
+.fms-result__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}

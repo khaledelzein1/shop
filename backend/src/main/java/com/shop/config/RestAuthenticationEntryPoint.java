@@ -39,7 +39,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
             Instant.now(),
             HttpStatus.UNAUTHORIZED.value(),
             HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-            "Authentification requise ou token invalide/expiré",
+            "Authentication required or invalid/expired token",
             request.getRequestURI(),
             null);
     response.getWriter().write(objectMapper.writeValueAsString(error));

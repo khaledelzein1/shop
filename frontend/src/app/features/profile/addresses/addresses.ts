@@ -56,7 +56,7 @@ export class Addresses implements OnInit {
   }
 
   delete(id: number): void {
-    if (!confirm('Supprimer cette adresse ?')) {
+    if (!confirm('Remove this address?')) {
       return;
     }
     this.addressService.delete(id).subscribe(() => this.load());

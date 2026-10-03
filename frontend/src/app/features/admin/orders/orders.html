@@ -1,10 +1,10 @@
-<h1>Commandes</h1>
+<h1>Orders</h1>
 
 <div class="filters-bar">
   <div class="form-field">
-    <label for="status">Statut</label>
+    <label for="status">Status</label>
     <select id="status" [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
-      <option value="">Tous</option>
+      <option value="">All</option>
       @for (s of statuses; track s) {
         <option [value]="s">{{ s }}</option>
       }
@@ -13,19 +13,19 @@
 </div>
 
 @if (loading()) {
-  <p>Chargement...</p>
+  <p>Loading...</p>
 } @else if (orders().length === 0) {
-  <p>Aucune commande.</p>
+  <p>No orders.</p>
 } @else {
   <table class="data-table">
     <thead>
       <tr>
-        <th>Commande</th>
-        <th>Client</th>
+        <th>Order</th>
+        <th>Customer</th>
         <th>Date</th>
-        <th>Articles</th>
+        <th>Items</th>
         <th>Total</th>
-        <th>Statut</th>
+        <th>Status</th>
       </tr>
     </thead>
     <tbody>

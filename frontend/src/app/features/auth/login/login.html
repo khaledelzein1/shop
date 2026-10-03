@@ -1,6 +1,6 @@
 <div class="auth-page">
   <div class="card auth-card">
-    <h1>Connexion</h1>
+    <h1>Log in</h1>
 
     @if (errorMessage()) {
       <div class="alert alert--error">{{ errorMessage() }}</div>
@@ -11,23 +11,23 @@
         <label for="email">Email</label>
         <input id="email" type="email" formControlName="email" autocomplete="email" />
         @if (form.controls.email.touched && form.controls.email.invalid) {
-          <span class="form-error">Email invalide</span>
+          <span class="form-error">Invalid email</span>
         }
       </div>
 
       <div class="form-field">
-        <label for="password">Mot de passe</label>
+        <label for="password">Password</label>
         <input id="password" type="password" formControlName="password" autocomplete="current-password" />
         @if (form.controls.password.touched && form.controls.password.invalid) {
-          <span class="form-error">Mot de passe requis</span>
+          <span class="form-error">Password required</span>
         }
       </div>
 
       <button type="submit" class="btn" [disabled]="loading()">
-        {{ loading() ? "Connexion..." : "Se connecter" }}
+        {{ loading() ? "Logging in..." : "Log in" }}
       </button>
     </form>
 
-    <p class="auth-switch">Pas encore de compte ? <a routerLink="/register">Inscris-toi</a></p>
+    <p class="auth-switch">Don't have an account yet? <a routerLink="/register">Sign up</a></p>
   </div>
 </div>

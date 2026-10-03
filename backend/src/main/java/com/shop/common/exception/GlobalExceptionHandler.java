@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().stream()
             .map(fe -> new ApiError.FieldError(fe.getField(), fe.getDefaultMessage()))
             .toList();
-    return build(HttpStatus.BAD_REQUEST, "Erreur de validation", request, fieldErrors);
+    return build(HttpStatus.BAD_REQUEST, "Validation error", request, fieldErrors);
   }
 
   @ExceptionHandler(ResourceNotFoundException.class)
@@ -52,12 +52,12 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ApiError> handleBadCredentials(
       BadCredentialsException ex, HttpServletRequest request) {
-    return build(HttpStatus.UNAUTHORIZED, "Email ou mot de passe incorrect", request, null);
+    return build(HttpStatus.UNAUTHORIZED, "Incorrect email or password", request, null);
   }
 
   @ExceptionHandler(DisabledException.class)
   public ResponseEntity<ApiError> handleDisabled(DisabledException ex, HttpServletRequest request) {
-    return build(HttpStatus.UNAUTHORIZED, "Ce compte est désactivé", request, null);
+    return build(HttpStatus.UNAUTHORIZED, "This account is disabled", request, null);
   }
 
   /**
@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(AuthenticationException.class)
   public ResponseEntity<ApiError> handleAuthentication(
       AuthenticationException ex, HttpServletRequest request) {
-    return build(HttpStatus.UNAUTHORIZED, "Authentification échouée", request, null);
+    return build(HttpStatus.UNAUTHORIZED, "Authentication failed", request, null);
   }
 
   /**
@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
       ObjectOptimisticLockingFailureException ex, HttpServletRequest request) {
     return build(
         HttpStatus.CONFLICT,
-        "Cette ressource a été modifiée entre-temps (ex. stock changé par une autre commande) — réessayez",
+        "This resource was modified in the meantime (e.g. stock changed by another order) — please try again",
         request,
         null);
   }
@@ -87,13 +87,12 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ApiError> handleAccessDenied(
       AccessDeniedException ex, HttpServletRequest request) {
-    return build(HttpStatus.FORBIDDEN, "Accès refusé", request, null);
+    return build(HttpStatus.FORBIDDEN, "Access denied", request, null);
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiError> handleGeneric(Exception ex, HttpServletRequest request) {
-    return build(
-        HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur inattendue est survenue", request, null);
+    return build(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request, null);
   }
 
   private ResponseEntity<ApiError> build(

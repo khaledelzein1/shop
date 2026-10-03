@@ -57,7 +57,7 @@ public class OrderService {
         cartRepository
             .findByUserId(userId)
             .filter(c -> !c.getItems().isEmpty())
-            .orElseThrow(() -> new ConflictException("Le panier est vide"));
+            .orElseThrow(() -> new ConflictException("Cart is empty"));
 
     Address address =
         addressRepository
@@ -65,15 +65,15 @@ public class OrderService {
             .orElseThrow(
                 () ->
                     new ResourceNotFoundException(
-                        "Adresse introuvable (id=" + request.addressId() + ")"));
+                        "Address not found (id=" + request.addressId() + ")"));
 
     for (CartItem cartItem : cart.getItems()) {
       ProductVariant variant = cartItem.getVariant();
       if (!variant.isActive() || variant.getStock() < cartItem.getQuantity()) {
         throw new ConflictException(
-            "Stock insuffisant pour '"
+            "Insufficient stock for '"
                 + variant.getSku()
-                + "' — vérifiez votre panier avant de commander");
+                + "' — please check your cart before ordering");
       }
     }
 
@@ -124,7 +124,7 @@ public class OrderService {
         orderRepository
             .findByIdAndUserId(orderId, userId)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Commande introuvable (id=" + orderId + ")"));
+                () -> new ResourceNotFoundException("Order not found (id=" + orderId + ")"));
     return OrderResponse.from(order);
   }
 
@@ -154,7 +154,7 @@ public class OrderService {
     Set<OrderStatus> allowed = ALLOWED_TRANSITIONS.getOrDefault(order.getStatus(), Set.of());
     if (!allowed.contains(newStatus)) {
       throw new ConflictException(
-          "Transition de statut invalide : " + order.getStatus() + " -> " + newStatus);
+          "Invalid status transition: " + order.getStatus() + " -> " + newStatus);
     }
 
     if (newStatus == OrderStatus.CANCELLED) {
@@ -173,7 +173,6 @@ public class OrderService {
   private Order findByIdOrThrow(Long orderId) {
     return orderRepository
         .findById(orderId)
-        .orElseThrow(
-            () -> new ResourceNotFoundException("Commande introuvable (id=" + orderId + ")"));
+        .orElseThrow(() -> new ResourceNotFoundException("Order not found (id=" + orderId + ")"));
   }
 }

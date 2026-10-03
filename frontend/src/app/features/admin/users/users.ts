@@ -31,7 +31,7 @@ export class AdminUsers implements OnInit {
       next: () => this.load(),
       error: (err: HttpErrorResponse) => {
         const apiError = err.error as ApiError | undefined;
-        alert(apiError?.message ?? "Action impossible");
+        alert(apiError?.message ?? "Action could not be completed");
       },
     });
   }

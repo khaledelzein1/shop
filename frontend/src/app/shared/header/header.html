@@ -3,7 +3,7 @@
     <a routerLink="/" class="header__brand">Shop</a>
 
     <nav class="header__nav">
-      <a routerLink="/products" routerLinkActive="is-active">Catalogue</a>
+      <a routerLink="/products" routerLinkActive="is-active">Catalog</a>
       @if (auth.isAdmin()) {
         <a routerLink="/admin" routerLinkActive="is-active">Admin</a>
       }
@@ -11,7 +11,7 @@
 
     <div class="header__actions">
       <a routerLink="/cart" routerLinkActive="is-active" class="header__cart">
-        Panier
+        Cart
         @if (cart.itemCount() > 0) {
           <span class="header__badge">{{ cart.itemCount() }}</span>
         }
@@ -19,10 +19,10 @@
 
       @if (auth.isAuthenticated()) {
         <a routerLink="/profile/orders" routerLinkActive="is-active">{{ auth.currentUser()?.firstName }}</a>
-        <button type="button" (click)="logout()">Déconnexion</button>
+        <button type="button" (click)="logout()">Log out</button>
       } @else {
-        <a routerLink="/login" routerLinkActive="is-active">Connexion</a>
-        <a routerLink="/register" routerLinkActive="is-active">Inscription</a>
+        <a routerLink="/login" routerLinkActive="is-active">Log in</a>
+        <a routerLink="/register" routerLinkActive="is-active">Sign up</a>
       }
     </div>
   </div>

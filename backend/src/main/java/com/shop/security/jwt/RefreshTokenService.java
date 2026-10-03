@@ -50,7 +50,7 @@ public class RefreshTokenService {
         refreshTokenRepository
             .findByTokenHash(hash(rawToken))
             .filter(RefreshToken::isValid)
-            .orElseThrow(() -> new CredentialsExpiredException("Refresh token invalide ou expiré"));
+            .orElseThrow(() -> new CredentialsExpiredException("Refresh token invalid or expired"));
 
     entity.setRevoked(true);
     return entity.getUser();
@@ -73,7 +73,7 @@ public class RefreshTokenService {
       byte[] hashed = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
       return HexFormat.of().formatHex(hashed);
     } catch (NoSuchAlgorithmException e) {
-      throw new IllegalStateException("SHA-256 indisponible sur cette JVM", e);
+      throw new IllegalStateException("SHA-256 unavailable on this JVM", e);
     }
   }
 }

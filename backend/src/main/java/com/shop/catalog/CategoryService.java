@@ -36,7 +36,7 @@ public class CategoryService {
   @Transactional
   public CategoryResponse create(CategoryRequest request) {
     if (categoryRepository.existsBySlug(request.slug())) {
-      throw new ConflictException("Une catégorie existe déjà avec le slug : " + request.slug());
+      throw new ConflictException("A category already exists with slug: " + request.slug());
     }
     Category category = new Category();
     applyRequest(category, request);
@@ -49,7 +49,7 @@ public class CategoryService {
     Category category = findByIdOrThrow(id);
     if (!category.getSlug().equals(request.slug())
         && categoryRepository.existsBySlug(request.slug())) {
-      throw new ConflictException("Une catégorie existe déjà avec le slug : " + request.slug());
+      throw new ConflictException("A category already exists with slug: " + request.slug());
     }
     applyRequest(category, request);
     return CategoryResponse.from(category);
@@ -61,9 +61,7 @@ public class CategoryService {
     Category category = findByIdOrThrow(id);
     if (productRepository.existsByCategoryId(id)) {
       throw new ConflictException(
-          "Impossible de supprimer la catégorie '"
-              + category.getName()
-              + "' : des produits y sont rattachés");
+          "Cannot delete category '" + category.getName() + "': products are still attached to it");
     }
     categoryRepository.delete(category);
   }
@@ -77,13 +75,12 @@ public class CategoryService {
   private Category findByIdOrThrow(Long id) {
     return categoryRepository
         .findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Catégorie introuvable (id=" + id + ")"));
+        .orElseThrow(() -> new ResourceNotFoundException("Category not found (id=" + id + ")"));
   }
 
   private Category findBySlugOrThrow(String slug) {
     return categoryRepository
         .findBySlug(slug)
-        .orElseThrow(
-            () -> new ResourceNotFoundException("Catégorie introuvable (slug=" + slug + ")"));
+        .orElseThrow(() -> new ResourceNotFoundException("Category not found (slug=" + slug + ")"));
   }
 }

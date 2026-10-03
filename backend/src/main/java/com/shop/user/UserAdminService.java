@@ -33,7 +33,7 @@ public class UserAdminService {
   @Transactional
   public AdminUserResponse updateStatus(Long id, boolean enabled, Long currentAdminId) {
     if (id.equals(currentAdminId) && !enabled) {
-      throw new ConflictException("Vous ne pouvez pas désactiver votre propre compte");
+      throw new ConflictException("You cannot disable your own account");
     }
     User user = findByIdOrThrow(id);
     user.setEnabled(enabled);
@@ -43,7 +43,6 @@ public class UserAdminService {
   private User findByIdOrThrow(Long id) {
     return userRepository
         .findById(id)
-        .orElseThrow(
-            () -> new ResourceNotFoundException("Utilisateur introuvable (id=" + id + ")"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found (id=" + id + ")"));
   }
 }

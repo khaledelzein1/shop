@@ -1,20 +1,20 @@
 <div class="admin-header">
-  <h1>Produits</h1>
-  <a routerLink="/admin/products/new" class="btn">+ Nouveau produit</a>
+  <h1>Products</h1>
+  <a routerLink="/admin/products/new" class="btn">+ New product</a>
 </div>
 
 @if (loading()) {
-  <p>Chargement...</p>
+  <p>Loading...</p>
 } @else {
   <table class="data-table">
     <thead>
       <tr>
-        <th>Nom</th>
-        <th>Marque</th>
-        <th>Catégorie</th>
-        <th>Prix</th>
+        <th>Name</th>
+        <th>Brand</th>
+        <th>Category</th>
+        <th>Price</th>
         <th>Stock</th>
-        <th>Statut</th>
+        <th>Status</th>
         <th></th>
       </tr>
     </thead>
@@ -31,13 +31,13 @@
               {{ product.minPrice | number: "1.2-2" }} – {{ product.maxPrice | number: "1.2-2" }} €
             }
           </td>
-          <td>{{ product.inStock ? "En stock" : "Rupture" }}</td>
+          <td>{{ product.inStock ? "In stock" : "Out of stock" }}</td>
           <td>
             <span class="status-pill" [class]="product.active ? 'CONFIRMED' : 'CANCELLED'">
-              {{ product.active ? "Actif" : "Inactif" }}
+              {{ product.active ? "Active" : "Inactive" }}
             </span>
           </td>
-          <td><a [routerLink]="['/admin/products', product.id]">Modifier</a></td>
+          <td><a [routerLink]="['/admin/products', product.id]">Edit</a></td>
         </tr>
       }
     </tbody>

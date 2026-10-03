@@ -14,7 +14,7 @@ public record ProductRequest(
     @NotBlank
         @Pattern(
             regexp = "^[a-z0-9]+(-[a-z0-9]+)*$",
-            message = "Le slug doit être en minuscules, sans espaces (ex: laptop-pro-15)")
+            message = "Slug must be lowercase, with no spaces (e.g. laptop-pro-15)")
         String slug,
     String description,
     String brand,

@@ -40,7 +40,7 @@ public class CartService {
             .orElseThrow(
                 () ->
                     new ResourceNotFoundException(
-                        "Variante introuvable ou indisponible (id=" + request.variantId() + ")"));
+                        "Variant not found or unavailable (id=" + request.variantId() + ")"));
 
     Optional<CartItem> existing =
         cartItemRepository.findByCartIdAndVariantId(cart.getId(), variant.getId());
@@ -77,6 +77,7 @@ public class CartService {
   public CartResponse removeItem(Long userId, Long itemId) {
     Cart cart = getCartOrThrow(userId);
     CartItem item = findOwnedItemOrThrow(cart, itemId);
+    cart.getItems().remove(item);
     cartItemRepository.delete(item);
     return CartResponse.from(cart);
   }
@@ -84,11 +85,11 @@ public class CartService {
   private void ensureStockAvailable(ProductVariant variant, int requestedQuantity) {
     if (requestedQuantity > variant.getStock()) {
       throw new ConflictException(
-          "Stock insuffisant pour '"
+          "Insufficient stock for '"
               + variant.getSku()
               + "' ("
               + variant.getStock()
-              + " disponible(s))");
+              + " available)");
     }
   }
 
@@ -106,14 +107,13 @@ public class CartService {
   private Cart getCartOrThrow(Long userId) {
     return cartRepository
         .findByUserId(userId)
-        .orElseThrow(() -> new ResourceNotFoundException("Panier introuvable"));
+        .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
   }
 
   private CartItem findOwnedItemOrThrow(Cart cart, Long itemId) {
     return cartItemRepository
         .findByIdAndCartId(itemId, cart.getId())
         .orElseThrow(
-            () ->
-                new ResourceNotFoundException("Article de panier introuvable (id=" + itemId + ")"));
+            () -> new ResourceNotFoundException("Cart item not found (id=" + itemId + ")"));
   }
 }

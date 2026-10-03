@@ -65,20 +65,20 @@ export class AdminCategories implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         const apiError = err.error as ApiError | undefined;
-        this.errorMessage.set(apiError?.message ?? 'Une erreur est survenue');
+        this.errorMessage.set(apiError?.message ?? 'An error occurred');
       },
     });
   }
 
   delete(id: number): void {
-    if (!confirm('Supprimer cette catégorie ?')) {
+    if (!confirm('Delete this category?')) {
       return;
     }
     this.catalogService.deleteCategory(id).subscribe({
       next: () => this.load(),
       error: (err: HttpErrorResponse) => {
         const apiError = err.error as ApiError | undefined;
-        alert(apiError?.message ?? 'Suppression impossible');
+        alert(apiError?.message ?? 'Cannot delete');
       },
     });
   }

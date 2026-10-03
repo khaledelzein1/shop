@@ -1,7 +1,7 @@
-<h1>Mon panier</h1>
+<h1>My cart</h1>
 
 @if (cart().items.length === 0) {
-  <p>Ton panier est vide. <a routerLink="/products">Voir le catalogue</a></p>
+  <p>Your cart is empty. <a routerLink="/products">View the catalog</a></p>
 } @else {
   <div class="cart">
     <div class="cart__items">
@@ -15,7 +15,7 @@
                 · {{ attr.value }}
               }
             </p>
-            <p class="cart-item__price">{{ item.unitPrice | number: "1.2-2" }} € / unité</p>
+            <p class="cart-item__price">{{ item.unitPrice | number: "1.2-2" }} € / unit</p>
           </div>
 
           <div class="cart-item__actions">
@@ -26,7 +26,7 @@
               (ngModelChange)="updateQuantity(item.id, $event)"
             />
             <p class="cart-item__total">{{ item.lineTotal | number: "1.2-2" }} €</p>
-            <button type="button" class="btn btn--danger" (click)="removeItem(item.id)">Supprimer</button>
+            <button type="button" class="btn btn--danger" (click)="removeItem(item.id)">Remove</button>
           </div>
         </div>
       }
@@ -35,7 +35,7 @@
     <div class="cart__summary card">
       <h2>Total</h2>
       <p class="cart__total">{{ cart().totalAmount | number: "1.2-2" }} €</p>
-      <a routerLink="/checkout" class="btn">Passer commande</a>
+      <a routerLink="/checkout" class="btn">Checkout</a>
     </div>
   </div>
 }
