@@ -43,6 +43,15 @@
     padding: 0.4rem 0.75rem;
     border-radius: 6px;
     cursor: pointer;
+    transition:
+      background-color var(--dur-fast),
+      border-color var(--dur-fast),
+      transform var(--dur-fast) var(--ease-out);
+
+    &:hover:not(.is-active) {
+      border-color: #2563eb;
+      transform: translateY(-1px);
+    }
 
     &.is-active {
       background: #2563eb;
@@ -60,10 +69,13 @@
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  transition: box-shadow 0.15s;
+  transition:
+    box-shadow var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out);
 
   &:hover {
-    box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+    box-shadow: 0 14px 30px rgb(0 0 0 / 10%);
+    transform: translateY(-5px);
   }
 
   img {
@@ -71,6 +83,11 @@
     aspect-ratio: 1;
     object-fit: cover;
     display: block;
+    transition: transform 0.7s var(--ease-out);
+  }
+
+  &:hover img {
+    transform: scale(1.06);
   }
 
   &__body {

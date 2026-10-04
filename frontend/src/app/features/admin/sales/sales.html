@@ -1,0 +1,153 @@
+<div class="admin-header">
+  <h1>Sales</h1>
+  <div class="period-switch" role="group" aria-label="Period">
+    @for (p of periods; track p) {
+      <button type="button" [class.is-active]="days() === p" [attr.aria-pressed]="days() === p" (click)="selectPeriod(p)">
+        {{ p === 365 ? "12 months" : p + " days" }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (report(); as r) {
+  <div class="sales" [class.is-loading]="loading()">
+    <!-- Headline figures -->
+    <div class="kpis anim-stagger">
+      <div class="card kpi" style="--i: 0">
+        <span class="kpi__label">Revenue</span>
+        <span class="kpi__value">{{ r.revenue | number: "1.2-2" }} €</span>
+        @if (revenueChange(); as change) {
+          <span class="kpi__delta" [class.kpi__delta--up]="change >= 0" [class.kpi__delta--down]="change < 0">
+            {{ change >= 0 ? "▲" : "▼" }} {{ change | number: "1.0-0" }}% vs previous {{ r.days }} days
+          </span>
+        } @else {
+          <span class="kpi__hint">No sales in the previous {{ r.days }} days</span>
+        }
+      </div>
+      <div class="card kpi" style="--i: 1">
+        <span class="kpi__label">Orders</span>
+        <span class="kpi__value">{{ r.orderCount }}</span>
+        <span class="kpi__hint">{{ r.previousOrderCount }} in the previous {{ r.days }} days</span>
+      </div>
+      <div class="card kpi" style="--i: 2">
+        <span class="kpi__label">Average order</span>
+        <span class="kpi__value">{{ r.averageOrderValue | number: "1.2-2" }} €</span>
+      </div>
+      <div class="card kpi" style="--i: 3">
+        <span class="kpi__label">Items sold</span>
+        <span class="kpi__value">{{ r.itemsSold }}</span>
+      </div>
+    </div>
+
+    <!-- Revenue per day (single series: one hue, no legend) -->
+    <section class="card chart-card anim-fade-up">
+      <h2>Revenue per day</h2>
+      <div
+        class="chart"
+        role="img"
+        [attr.aria-label]="'Revenue per day over the last ' + r.days + ' days, total ' + (r.revenue | number: '1.2-2') + ' euros'"
+        (mouseleave)="hovered.set(null)"
+      >
+        <div class="chart__grid" aria-hidden="true">
+          @for (g of gridlines(); track $index) {
+            <div class="chart__gridline">
+              <span>{{ g | number: "1.0-0" }} €</span>
+            </div>
+          }
+        </div>
+        <div class="chart__bars">
+          @for (d of r.daily; track d.date; let i = $index) {
+            <div class="chart__slot" [class.is-hovered]="hovered() === i" (mouseenter)="hovered.set(i)">
+              <div class="chart__bar" [style.height.%]="barHeight(d)" [class.chart__bar--empty]="d.revenue === 0"></div>
+              @if (hovered() === i) {
+                <div class="chart__tooltip" [class.chart__tooltip--left]="i > r.daily.length * 0.7">
+                  <strong>{{ d.date | date: "EEE d MMM" }}</strong>
+                  <span>{{ d.revenue | number: "1.2-2" }} €</span>
+                  <span class="chart__tooltip-muted">{{ d.orders }} {{ d.orders === 1 ? "order" : "orders" }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <div class="chart__axis" aria-hidden="true">
+          @for (d of r.daily; track d.date; let i = $index) {
+            <span>{{ showTick(i, r.daily.length) ? (d.date | date: (r.days > 90 ? "MMM" : "d MMM")) : "" }}</span>
+          }
+        </div>
+      </div>
+      <details class="chart__table">
+        <summary>Show as table</summary>
+        <table class="data-table">
+          <thead>
+            <tr><th>Date</th><th>Orders</th><th>Revenue</th></tr>
+          </thead>
+          <tbody>
+            @for (d of r.daily; track d.date) {
+              @if (d.orders > 0) {
+                <tr>
+                  <td>{{ d.date | date: "d MMM y" }}</td>
+                  <td>{{ d.orders }}</td>
+                  <td>{{ d.revenue | number: "1.2-2" }} €</td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </details>
+    </section>
+
+    <div class="sales__columns">
+      <section class="card anim-fade-up">
+        <h2>Best sellers</h2>
+        @if (r.topProducts.length === 0) {
+          <p class="empty">No sales in this period.</p>
+        } @else {
+          <ol class="top-list">
+            @for (p of r.topProducts; track p.name) {
+              <li>
+                <div class="top-list__row">
+                  <span class="top-list__name">{{ p.name }}</span>
+                  <span class="top-list__figures">{{ p.quantity }} sold · {{ p.revenue | number: "1.2-2" }} €</span>
+                </div>
+                <div class="top-list__track">
+                  <div class="top-list__bar" [style.width.%]="(p.quantity / topMax()) * 100"></div>
+                </div>
+              </li>
+            }
+          </ol>
+        }
+      </section>
+
+      <section class="card anim-fade-up">
+        <div class="section-head">
+          <h2>Latest sales</h2>
+          <a routerLink="/admin/orders">All orders →</a>
+        </div>
+        @if (r.recentSales.length === 0) {
+          <p class="empty">No sales yet.</p>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr><th>#</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              @for (s of r.recentSales; track s.id) {
+                <tr>
+                  <td>{{ s.id }}</td>
+                  <td>{{ s.createdAt | date: "d MMM, HH:mm" }}</td>
+                  <td class="customer">{{ s.customerEmail }}</td>
+                  <td>{{ s.total | number: "1.2-2" }} €</td>
+                  <td><span class="status-pill" [class]="s.status">{{ s.status }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+    </div>
+  </div>
+} @else if (loading()) {
+  <p>Loading...</p>
+} @else {
+  <p class="alert alert--error">Could not load the sales report.</p>
+}

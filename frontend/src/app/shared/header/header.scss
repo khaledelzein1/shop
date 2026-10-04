@@ -21,15 +21,38 @@
     text-decoration: none;
   }
 
-  &__nav {
-    display: flex;
-    gap: 1.25rem;
-    flex: 1;
-
+  &__nav,
+  &__actions {
     a {
+      position: relative;
       color: #d1d5db;
       text-decoration: none;
       font-size: 0.9rem;
+      transition: color var(--dur-fast);
+
+      // Underline that grows from the left on hover / stays on the active link.
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -4px;
+        height: 2px;
+        border-radius: 2px;
+        background: #60a5fa;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform var(--dur-med) var(--ease-out);
+      }
+
+      &:hover {
+        color: #f9fafb;
+      }
+
+      &:hover::after,
+      &.is-active::after {
+        transform: scaleX(1);
+      }
 
       &.is-active {
         color: #f9fafb;
@@ -38,21 +61,16 @@
     }
   }
 
+  &__nav {
+    display: flex;
+    gap: 1.25rem;
+    flex: 1;
+  }
+
   &__actions {
     display: flex;
     align-items: center;
     gap: 1rem;
-
-    a {
-      color: #d1d5db;
-      text-decoration: none;
-      font-size: 0.9rem;
-
-      &.is-active {
-        color: #f9fafb;
-        font-weight: 600;
-      }
-    }
 
     button {
       background: transparent;
@@ -62,9 +80,13 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 0.85rem;
+      transition:
+        background-color var(--dur-fast),
+        border-color var(--dur-fast);
 
       &:hover {
         background: #374151;
+        border-color: #6b7280;
       }
     }
   }
@@ -83,5 +105,20 @@
     font-size: 0.7rem;
     padding: 0.1rem 0.4rem;
     font-weight: 700;
+    animation: badge-bump 0.45s var(--ease-out);
+  }
+}
+
+@keyframes badge-bump {
+  0% {
+    transform: scale(0.4);
+  }
+
+  60% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
   }
 }

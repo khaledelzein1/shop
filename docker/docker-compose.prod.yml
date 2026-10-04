@@ -43,7 +43,11 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET est requis (32 caractères minimum) — voir .env.example}
       SEED_ADMIN_ENABLED: ${SEED_ADMIN_ENABLED:-false}
       SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@shop.local}
+      SEED_ADMIN_USERNAME: ${SEED_ADMIN_USERNAME:-admin}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+      # Paiement par carte (Stripe Checkout) — vide = checkout désactivé (503).
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
     depends_on:
       postgres:
         condition: service_healthy

@@ -61,6 +61,13 @@
             <version>7.4</version>
         </dependency>
 
+        <!-- Paiement par carte via Stripe Checkout (page de paiement hébergée par Stripe) -->
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>34.0.0</version>
+        </dependency>
+
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>

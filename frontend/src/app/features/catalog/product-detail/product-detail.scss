@@ -13,6 +13,7 @@
   border-radius: 8px;
   aspect-ratio: 1;
   object-fit: cover;
+  animation: fade-in var(--dur-med) ease-out;
 }
 
 .back-link {
@@ -63,6 +64,14 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
+  transition:
+    border-color var(--dur-fast),
+    background-color var(--dur-fast),
+    color var(--dur-fast);
+
+  &:hover:not(:disabled) {
+    border-color: #2563eb;
+  }
 
   &.is-selected {
     border-color: #2563eb;
@@ -113,11 +122,19 @@
   background: white;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color var(--dur-med),
+    box-shadow var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out);
 
   &:hover {
     border-color: #2563eb;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
+  }
+
+  &:active {
+    transform: translateY(-2px) scale(0.99);
   }
 }
 
@@ -133,14 +150,36 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+    transition: transform 0.7s var(--ease-out);
+
+    .fit-tile:hover & {
+      transform: scale(1.06);
+    }
   }
 }
 
 .fit-tile__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-weight: 700;
   font-size: 1.1rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.fit-tile__arrow {
+  color: #2563eb;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity var(--dur-med),
+    transform var(--dur-med) var(--ease-out);
+
+  .fit-tile:hover & {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .fit-tile__count {
@@ -172,6 +211,12 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    animation: fade-in var(--dur-med) ease-out;
+    transition: transform 0.7s var(--ease-out);
+
+    .model-card:hover & {
+      transform: scale(1.05);
+    }
   }
 }
 
@@ -193,6 +238,13 @@
   border: 1px solid rgba(0, 0, 0, 0.25);
   background: rgba(255, 255, 255, 0.85);
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast),
+    transform var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    transform: scale(1.3);
+  }
 
   &.is-selected {
     background: #111827;
@@ -224,9 +276,13 @@
   cursor: pointer;
   color: #111827;
   padding: 0.2rem 0.4rem;
+  transition:
+    color var(--dur-fast),
+    transform var(--dur-med) var(--ease-out);
 
   &:hover:not(:disabled) {
     color: #2563eb;
+    transform: rotate(90deg) scale(1.2);
   }
 
   &:disabled {
@@ -249,6 +305,8 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   padding: 0.4rem;
   gap: 0.2rem;
+  transform-origin: top right;
+  animation: pop-in var(--dur-med) var(--ease-out);
 }
 
 .size-picker__label {
@@ -265,9 +323,13 @@
   border-radius: 4px;
   font-size: 0.85rem;
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast),
+    padding-left var(--dur-fast) var(--ease-out);
 
   &:hover {
     background: #f3f4f6;
+    padding-left: 0.6rem;
   }
 }
 
@@ -296,6 +358,7 @@
   margin-top: 0.3rem;
   font-size: 0.8rem;
   color: #16a34a;
+  animation: pop-in var(--dur-med) var(--ease-out);
 }
 
 .swatch {
@@ -305,6 +368,13 @@
   padding: 0;
   cursor: pointer;
   border: 1.5px solid #9ca3af;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast);
+
+  &:hover:not(:disabled) {
+    transform: scale(1.18);
+  }
 
   &.is-selected {
     box-shadow: 0 0 0 2px white inset, 0 0 0 2px #111827;
@@ -362,6 +432,22 @@
   &--blue-gray {
     background: #5b6b78;
   }
+
+  &--navy-blue {
+    background: #1f2a3c;
+  }
+
+  &--sky-blue {
+    background: #c6dde3;
+  }
+
+  &--mint {
+    background: #cdeee0;
+  }
+
+  &--grey {
+    background: #b9bcbf;
+  }
 }
 
 .custom-select {
@@ -396,6 +482,11 @@
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-top: 5px solid #6b7280;
+  transition: transform var(--dur-med) var(--ease-out);
+
+  .is-open & {
+    transform: rotate(180deg);
+  }
 }
 
 .custom-select__panel {
@@ -411,6 +502,8 @@
   border-radius: 10px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   z-index: 20;
+  transform-origin: top center;
+  animation: pop-in var(--dur-med) var(--ease-out);
 }
 
 .custom-select__option {

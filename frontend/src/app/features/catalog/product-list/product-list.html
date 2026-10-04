@@ -37,9 +37,9 @@
     } @else if (products().length === 0) {
       <p>No product matches these criteria.</p>
     } @else {
-      <div class="catalog__grid">
-        @for (product of products(); track product.id) {
-          <a class="product-card" [routerLink]="['/products', product.slug]">
+      <div class="catalog__grid anim-stagger">
+        @for (product of products(); track product.id; let i = $index) {
+          <a class="product-card" [style.--i]="i" [routerLink]="['/products', product.slug]">
             <img [src]="product.primaryImageUrl ?? 'https://placehold.co/300x300?text=Shop'" [alt]="product.name" />
             <div class="product-card__body">
               <p class="product-card__brand">{{ product.brand }}</p>

@@ -3,6 +3,10 @@
   <a routerLink="/admin/products/new" class="btn">+ New product</a>
 </div>
 
+@if (errorMessage()) {
+  <div class="alert alert--error">{{ errorMessage() }}</div>
+}
+
 @if (loading()) {
   <p>Loading...</p>
 } @else {
@@ -37,7 +41,17 @@
               {{ product.active ? "Active" : "Inactive" }}
             </span>
           </td>
-          <td><a [routerLink]="['/admin/products', product.id]">Edit</a></td>
+          <td class="row-actions">
+            <a class="link-btn" [routerLink]="['/admin/products', product.id]">Edit</a>
+            <button
+              type="button"
+              class="link-btn link-btn--danger"
+              [disabled]="deletingId() === product.id"
+              (click)="deleteProduct(product)"
+            >
+              {{ deletingId() === product.id ? "Deleting..." : "Delete" }}
+            </button>
+          </td>
         </tr>
       }
     </tbody>

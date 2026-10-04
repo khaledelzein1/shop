@@ -36,6 +36,19 @@ export const routes: Routes = [
     loadComponent: () => import('./features/checkout/checkout-page').then((m) => m.CheckoutPage),
     canActivate: [authGuard],
   },
+  // Pages de retour de Stripe Checkout (success_url / cancel_url côté backend).
+  {
+    path: 'checkout/success',
+    loadComponent: () => import('./features/checkout/payment-result').then((m) => m.PaymentResult),
+    canActivate: [authGuard],
+    data: { outcome: 'success' },
+  },
+  {
+    path: 'checkout/cancel',
+    loadComponent: () => import('./features/checkout/payment-result').then((m) => m.PaymentResult),
+    canActivate: [authGuard],
+    data: { outcome: 'cancel' },
+  },
   {
     path: 'profile/addresses',
     loadComponent: () => import('./features/profile/addresses/addresses').then((m) => m.Addresses),
@@ -77,6 +90,14 @@ export const routes: Routes = [
       {
         path: 'users',
         loadComponent: () => import('./features/admin/users/users').then((m) => m.AdminUsers),
+      },
+      {
+        path: 'sales',
+        loadComponent: () => import('./features/admin/sales/sales').then((m) => m.AdminSales),
+      },
+      {
+        path: 'account',
+        loadComponent: () => import('./features/admin/account/account').then((m) => m.AdminAccount),
       },
     ],
   },

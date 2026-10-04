@@ -1,0 +1,55 @@
+<div class="admin-header">
+  <h1>Account</h1>
+</div>
+
+<div class="card admin-form anim-fade-up">
+  <p class="account-intro">
+    Choose the username and password you use to log in to the admin area. You can also still log in with
+    <strong>{{ auth.currentUser()?.email }}</strong>.
+  </p>
+
+  @if (successMessage()) {
+    <div class="alert alert--success">{{ successMessage() }}</div>
+  }
+  @if (errorMessage()) {
+    <div class="alert alert--error">{{ errorMessage() }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-field">
+      <label for="username">Username</label>
+      <input id="username" type="text" formControlName="username" autocomplete="username" autocapitalize="none" />
+      @if (form.controls.username.touched && form.controls.username.invalid) {
+        <span class="form-error">3 to 30 characters: letters, digits, ".", "_" or "-"</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="newPassword">New password <span class="optional">(leave empty to keep the current one)</span></label>
+      <input id="newPassword" type="password" formControlName="newPassword" autocomplete="new-password" />
+      @if (form.controls.newPassword.touched && form.controls.newPassword.invalid) {
+        <span class="form-error">At least 8 characters</span>
+      }
+    </div>
+
+    @if (form.controls.newPassword.value) {
+      <div class="form-field anim-fade-up">
+        <label for="confirmPassword">Confirm new password</label>
+        <input id="confirmPassword" type="password" formControlName="confirmPassword" autocomplete="new-password" />
+        @if (form.controls.confirmPassword.touched && form.hasError("passwordMismatch")) {
+          <span class="form-error">Passwords don't match</span>
+        }
+      </div>
+    }
+
+    <div class="form-field">
+      <label for="currentPassword">Current password</label>
+      <input id="currentPassword" type="password" formControlName="currentPassword" autocomplete="current-password" />
+      @if (form.controls.currentPassword.touched && form.controls.currentPassword.invalid) {
+        <span class="form-error">Required to confirm the change</span>
+      }
+    </div>
+
+    <button type="submit" class="btn" [disabled]="saving()">{{ saving() ? "Saving..." : "Save changes" }}</button>
+  </form>
+</div>

@@ -49,7 +49,16 @@ export class ProductDetail implements OnInit {
         groups.set(model, [variant]);
       }
     }
-    return Array.from(groups.entries()).map(([name, variants]) => ({ name, variants }));
+    // Within a model, colors follow their photos' position (lowest first), so the first
+    // variant — the one a card opens on — is the one whose photo was placed first.
+    const firstPosition = (variant: ProductVariant): number => {
+      const positions = (this.product()?.images ?? []).filter((img) => img.variantId === variant.id).map((img) => img.position);
+      return positions.length > 0 ? Math.min(...positions) : Number.MAX_SAFE_INTEGER;
+    };
+    return Array.from(groups.entries()).map(([name, variants]) => ({
+      name,
+      variants: [...variants].sort((a, b) => firstPosition(a) - firstPosition(b)),
+    }));
   });
 
   /** Model grid shown on the product page: excludes the legacy "Classic" group. */
@@ -243,9 +252,10 @@ export class ProductDetail implements OnInit {
     Trousers: '/products/trousers-tile.png',
     Straight: '/products/straight-tile.png',
     SKINNY: '/products/skinny-tile.png',
-    Puffer: 'https://images.unsplash.com/photo-1614031679232-0dae776a72ee?w=600&h=600&fit=crop',
-    Leather: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=600&fit=crop',
-    Denim: 'https://images.unsplash.com/photo-1611312449408-fcece27cdbb7?w=600&h=600&fit=crop',
+    Puffer: '/products/jackets/lightweight-padded-black-model.png',
+    Leather: '/products/jackets/leather-moto-model.png',
+    Denim: '/products/jackets/flocked-denim-cropped-model.png',
+    'Short Sleeve': '/products/basic-heavyweight-tshirt-white-model.png',
   };
 
   /** Representative image for a fit tile. Falls back to the first model's photo if the fit has no fixed cover. */

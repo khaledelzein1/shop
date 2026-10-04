@@ -31,6 +31,10 @@
         {{ o.shippingAddress.zipCode }} {{ o.shippingAddress.city }}<br />
         {{ o.shippingAddress.country }}
       </p>
+      @if (o.cardLast4) {
+        <h2>Payment</h2>
+        <p>{{ o.cardBrand }} •••• {{ o.cardLast4 }}</p>
+      }
     </div>
   </div>
 }

@@ -11,5 +11,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   boolean existsByEmail(String email);
 
+  Optional<User> findByUsernameIgnoreCase(String username);
+
+  boolean existsByUsernameIgnoreCaseAndIdNot(String username, Long id);
+
   Page<User> findByEmailContainingIgnoreCase(String email, Pageable pageable);
+
+  /**
+   * Résout l'identifiant saisi au login : un email s'il contient « @ » (un nom d'utilisateur ne
+   * peut pas en contenir), sinon un nom d'utilisateur.
+   */
+  default Optional<User> findByLogin(String login) {
+    return login.contains("@") ? findByEmail(login) : findByUsernameIgnoreCase(login);
+  }
 }

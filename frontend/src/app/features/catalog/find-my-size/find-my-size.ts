@@ -37,6 +37,8 @@ export class FindMySize {
 
   protected readonly fitOptions = FindMySize.FIT_OPTIONS;
   protected readonly hasReturnTarget = !!this.returnModel && !!this.returnProduct;
+  /** Catalog page the "Back to catalog" link leads to: the product the customer came from, else jackets. */
+  protected readonly backProduct = this.returnProduct ?? 'jackets';
 
   submitMeasurements(): void {
     if (!this.heightCm() || !this.weightKg()) {

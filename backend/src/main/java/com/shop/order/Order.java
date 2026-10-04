@@ -63,4 +63,19 @@ public class Order extends BaseEntity {
 
   @Column(name = "shipping_country", nullable = false)
   private String shippingCountry;
+
+  /**
+   * Session Stripe Checkout ouverte pour payer cette commande. Le statut de paiement est toujours
+   * relu chez Stripe à partir de cet id, jamais déduit de ce que renvoie le navigateur.
+   */
+  @Column(name = "stripe_session_id", unique = true)
+  private String stripeSessionId;
+
+  /** Carte utilisée ("Visa", "Mastercard"…) — renseigné par le formulaire de carte intégré. */
+  @Column(name = "card_brand", length = 30)
+  private String cardBrand;
+
+  /** 4 derniers chiffres de la carte ; le numéro complet n'est jamais stocké. */
+  @Column(name = "card_last4", length = 4)
+  private String cardLast4;
 }

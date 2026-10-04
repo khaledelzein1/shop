@@ -1,5 +1,7 @@
 package com.shop.common.exception;
 
+import com.shop.payment.PaymentDeclinedException;
+import com.shop.payment.PaymentUnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
@@ -44,15 +46,37 @@ public class GlobalExceptionHandler {
     return build(HttpStatus.CONFLICT, ex.getMessage(), request, null);
   }
 
+  @ExceptionHandler(InvalidCurrentPasswordException.class)
+  public ResponseEntity<ApiError> handleInvalidCurrentPassword(
+      InvalidCurrentPasswordException ex, HttpServletRequest request) {
+    return build(
+        HttpStatus.BAD_REQUEST,
+        ex.getMessage(),
+        request,
+        List.of(new ApiError.FieldError("currentPassword", ex.getMessage())));
+  }
+
   @ExceptionHandler(ConflictException.class)
   public ResponseEntity<ApiError> handleConflict(ConflictException ex, HttpServletRequest request) {
     return build(HttpStatus.CONFLICT, ex.getMessage(), request, null);
   }
 
+  @ExceptionHandler(PaymentDeclinedException.class)
+  public ResponseEntity<ApiError> handlePaymentDeclined(
+      PaymentDeclinedException ex, HttpServletRequest request) {
+    return build(HttpStatus.PAYMENT_REQUIRED, ex.getMessage(), request, null);
+  }
+
+  @ExceptionHandler(PaymentUnavailableException.class)
+  public ResponseEntity<ApiError> handlePaymentUnavailable(
+      PaymentUnavailableException ex, HttpServletRequest request) {
+    return build(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request, null);
+  }
+
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ApiError> handleBadCredentials(
       BadCredentialsException ex, HttpServletRequest request) {
-    return build(HttpStatus.UNAUTHORIZED, "Incorrect email or password", request, null);
+    return build(HttpStatus.UNAUTHORIZED, "Incorrect username/email or password", request, null);
   }
 
   @ExceptionHandler(DisabledException.class)

@@ -14,12 +14,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   private final UserRepository userRepository;
 
+  /**
+   * {@code login} est un email (sujet des JWT, ou saisi au login) ou un nom d'utilisateur — voir
+   * {@link UserRepository#findByLogin}.
+   */
   @Override
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
     User user =
         userRepository
-            .findByEmail(email)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+            .findByLogin(login)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + login));
     return new UserPrincipal(user);
   }
 }

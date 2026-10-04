@@ -68,7 +68,7 @@ class CartServiceTest {
 
     assertThatThrownBy(() -> cartService.addItem(10L, new AddCartItemRequest(1L, 10)))
         .isInstanceOf(ConflictException.class)
-        .hasMessageContaining("Stock insuffisant");
+        .hasMessageContaining("Insufficient stock");
   }
 
   @Test

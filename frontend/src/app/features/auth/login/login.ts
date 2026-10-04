@@ -20,7 +20,7 @@ export class Login {
   protected readonly errorMessage = signal<string | null>(null);
 
   protected readonly form = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
+    login: ['', [Validators.required]],
     password: ['', [Validators.required]],
   });
 
@@ -35,7 +35,7 @@ export class Login {
     this.auth.login(this.form.getRawValue()).subscribe({
       next: () => {
         this.loading.set(false);
-        this.router.navigate(['/']);
+        this.router.navigate([this.auth.isAdmin() ? '/admin' : '/']);
       },
       error: (err: HttpErrorResponse) => {
         this.loading.set(false);

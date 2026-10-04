@@ -2,6 +2,104 @@
   box-sizing: border-box;
 }
 
+// ---- Motion ----------------------------------------------------------------
+// Shared easing/durations and entrance animations. Elements opt in with
+// `.anim-fade-up` (single) or `.anim-stagger` (children enter one after the
+// other; set `--i` on each child to its index for the delay).
+
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 0.18s;
+  --dur-med: 0.35s;
+  --dur-slow: 0.6s;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.anim-fade-up {
+  animation: fade-up var(--dur-slow) var(--ease-out) backwards;
+}
+
+.anim-stagger > * {
+  animation: fade-up var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: calc(min(var(--i, 0), 12) * 60ms);
+}
+
+// Page-to-page transitions (router `withViewTransitions()`); the header stays put.
+::view-transition-old(root) {
+  animation: page-out 0.2s ease-in both;
+}
+
+::view-transition-new(root) {
+  animation: page-in 0.4s var(--ease-out) both;
+}
+
+app-header {
+  view-transition-name: site-header;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 body {
   margin: 0;
   font-family:
@@ -39,9 +137,23 @@ button {
   cursor: pointer;
   text-decoration: none;
   text-align: center;
+  transition:
+    background-color var(--dur-fast),
+    box-shadow var(--dur-fast),
+    transform var(--dur-fast) var(--ease-out);
 
   &:hover {
     background: #1d4ed8;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(37 99 235 / 25%);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+    box-shadow: none;
   }
 
   &:disabled {
@@ -57,6 +169,10 @@ button {
 
   &:hover {
     background: #f3f4f6;
+  }
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   }
 }
 
@@ -95,6 +211,15 @@ button {
     border-radius: 6px;
     font-size: 0.95rem;
     font-family: inherit;
+    transition:
+      border-color var(--dur-fast),
+      box-shadow var(--dur-fast);
+
+    &:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgb(37 99 235 / 15%);
+    }
   }
 
   .form-error {
@@ -108,6 +233,7 @@ button {
   border-radius: 6px;
   font-size: 0.9rem;
   margin-bottom: 1rem;
+  animation: pop-in var(--dur-med) var(--ease-out) backwards;
 }
 
 .alert--error {
@@ -281,6 +407,27 @@ table.data-table {
   }
 }
 
+.account-intro {
+  margin-top: 0;
+  color: #374151;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.optional {
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.row-actions {
+  white-space: nowrap;
+  text-align: right;
+
+  a.link-btn {
+    text-decoration: none;
+  }
+}
+
 .stock-input {
   width: 70px;
   padding: 0.3rem 0.5rem;
@@ -335,10 +482,13 @@ table.data-table {
 .dashboard-link {
   text-decoration: none;
   color: inherit;
-  transition: box-shadow 0.15s;
+  transition:
+    box-shadow var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out);
 
   &:hover {
-    box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+    box-shadow: 0 10px 24px rgb(0 0 0 / 8%);
+    transform: translateY(-3px);
   }
 
   h3 {

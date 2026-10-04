@@ -1,0 +1,334 @@
+// Chart tokens: one hue for the single revenue series, recessive grid/axis ink.
+$series: #2563eb;
+$series-hover: #1d4ed8;
+$grid: #eef0f3;
+$ink-muted: #6b7280;
+
+.period-switch {
+  display: inline-flex;
+  padding: 3px;
+  background: #eef0f3;
+  border-radius: 8px;
+  gap: 2px;
+
+  button {
+    border: none;
+    background: transparent;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #374151;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-fast),
+      color var(--dur-fast),
+      box-shadow var(--dur-fast);
+
+    &:hover:not(.is-active) {
+      color: #111827;
+    }
+
+    &.is-active {
+      background: white;
+      color: #111827;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+    }
+  }
+}
+
+.sales {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: opacity var(--dur-med);
+
+  &.is-loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  h2 {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+  }
+}
+
+// ---- Stat tiles ---------------------------------------------------------------
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $ink-muted;
+  }
+
+  &__value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #111827;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__hint,
+  &__delta {
+    font-size: 0.8rem;
+    color: $ink-muted;
+  }
+
+  &__delta--up {
+    color: #15803d;
+  }
+
+  &__delta--down {
+    color: #b91c1c;
+  }
+}
+
+// ---- Revenue per day --------------------------------------------------------
+
+.chart {
+  position: relative;
+  display: grid;
+  grid-template-rows: 220px auto;
+  padding-left: 3.5rem;
+}
+
+.chart__grid {
+  grid-row: 1;
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.chart__gridline {
+  position: relative;
+  border-top: 1px solid $grid;
+  height: 0;
+
+  &:last-child {
+    border-top-color: #d1d5db; // baseline
+  }
+
+  span {
+    position: absolute;
+    right: calc(100% + 0.5rem);
+    top: -0.55rem;
+    font-size: 0.7rem;
+    color: $ink-muted;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.chart__bars {
+  grid-row: 1;
+  grid-column: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px; // surface gap between adjacent bars
+}
+
+.chart__slot {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  cursor: default;
+
+  // Hit target is the whole column, not just the (possibly tiny) bar.
+  &.is-hovered {
+    background: rgb(37 99 235 / 5%);
+    border-radius: 4px 4px 0 0;
+  }
+}
+
+.chart__bar {
+  width: 100%;
+  max-width: 28px;
+  background: $series;
+  border-radius: 4px 4px 0 0;
+  transform-origin: bottom;
+  animation: bar-grow 0.7s var(--ease-out) backwards;
+  transition:
+    height var(--dur-med) var(--ease-out),
+    background-color var(--dur-fast);
+
+  .is-hovered & {
+    background: $series-hover;
+  }
+
+  &--empty {
+    height: 0 !important;
+  }
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+// Pinned to the top of the column (not the bar) so it never covers the bar being read.
+.chart__tooltip {
+  position: absolute;
+  top: 0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 120px;
+  padding: 0.5rem 0.65rem;
+  background: #111827;
+  color: #f9fafb;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 18%);
+  pointer-events: none;
+  animation: fade-in var(--dur-fast) ease-out;
+
+  &--left {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+}
+
+.chart__tooltip-muted {
+  color: #9ca3af;
+}
+
+.chart__axis {
+  display: flex;
+  gap: 2px;
+  margin-top: 0.4rem;
+
+  span {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.7rem;
+    color: $ink-muted;
+    text-align: center;
+    white-space: nowrap;
+    overflow: visible;
+  }
+}
+
+.chart__table {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+
+  summary {
+    cursor: pointer;
+    color: #2563eb;
+  }
+
+  table {
+    margin-top: 0.75rem;
+  }
+}
+
+// ---- Best sellers / latest sales -------------------------------------------
+
+.sales__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 1.25rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+
+  a {
+    font-size: 0.85rem;
+    text-decoration: none;
+  }
+}
+
+.top-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.35rem;
+  }
+
+  &__name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__figures {
+    color: $ink-muted;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__track {
+    height: 8px;
+    background: $grid;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  &__bar {
+    height: 100%;
+    background: $series;
+    border-radius: 4px;
+    transform-origin: left;
+    animation: bar-grow-x 0.8s var(--ease-out) backwards;
+  }
+}
+
+@keyframes bar-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.customer {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  color: $ink-muted;
+  font-size: 0.9rem;
+}

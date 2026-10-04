@@ -11,7 +11,7 @@ const LOGIN_RESPONSE = {
   refreshToken: 'fake-refresh-token',
   tokenType: 'Bearer',
   expiresInSeconds: 900,
-  user: { id: 1, email: 'user@example.com', firstName: 'A', lastName: 'B', roles: ['ROLE_USER'] },
+  user: { id: 1, email: 'user@example.com', username: null, firstName: 'A', lastName: 'B', roles: ['ROLE_USER'] },
 };
 
 describe('AuthService', () => {
@@ -38,7 +38,7 @@ describe('AuthService', () => {
   });
 
   it('login stores access + refresh tokens and user, marking the session as authenticated', () => {
-    service.login({ email: 'user@example.com', password: 'password123' }).subscribe();
+    service.login({ login: 'user@example.com', password: 'password123' }).subscribe();
 
     const req = httpMock.expectOne(`${environment.apiUrl}/auth/login`);
     expect(req.request.method).toBe('POST');
@@ -52,18 +52,18 @@ describe('AuthService', () => {
   });
 
   it('isAdmin is true only when the user has ROLE_ADMIN', () => {
-    service.login({ email: 'admin@example.com', password: 'password123' }).subscribe();
+    service.login({ login: 'admin@example.com', password: 'password123' }).subscribe();
     httpMock.expectOne(`${environment.apiUrl}/auth/login`).flush({
       ...LOGIN_RESPONSE,
       accessToken: 'admin-token',
-      user: { id: 1, email: 'admin@example.com', firstName: 'Admin', lastName: 'Shop', roles: ['ROLE_ADMIN'] },
+      user: { id: 1, email: 'admin@example.com', username: 'admin', firstName: 'Admin', lastName: 'Shop', roles: ['ROLE_ADMIN'] },
     });
 
     expect(service.isAdmin()).toBe(true);
   });
 
   it('refresh rotates the stored tokens', () => {
-    service.login({ email: 'user@example.com', password: 'password123' }).subscribe();
+    service.login({ login: 'user@example.com', password: 'password123' }).subscribe();
     httpMock.expectOne(`${environment.apiUrl}/auth/login`).flush(LOGIN_RESPONSE);
 
     service.refresh().subscribe();
@@ -76,7 +76,7 @@ describe('AuthService', () => {
   });
 
   it('logout revokes the refresh token server-side and clears local state', () => {
-    service.login({ email: 'user@example.com', password: 'password123' }).subscribe();
+    service.login({ login: 'user@example.com', password: 'password123' }).subscribe();
     httpMock.expectOne(`${environment.apiUrl}/auth/login`).flush(LOGIN_RESPONSE);
 
     service.logout();

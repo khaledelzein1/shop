@@ -1,0 +1,53 @@
+<div class="result card">
+  @if (error()) {
+    <div class="result__icon result__icon--error" aria-hidden="true">!</div>
+    <h1>Something went wrong</h1>
+    <p>{{ error() }}</p>
+    <a routerLink="/profile/orders" class="btn">My orders</a>
+  } @else if (order(); as o) {
+    @switch (o.status) {
+      @case ("PENDING") {
+        @if (stillChecking(o)) {
+          <div class="result__spinner" aria-hidden="true"></div>
+          <h1>Confirming your payment...</h1>
+          <p>This only takes a moment. Please don't close this page.</p>
+        } @else {
+          <div class="result__icon result__icon--pending" aria-hidden="true">…</div>
+          <h1>Payment not completed yet</h1>
+          <p>
+            Order #{{ o.id }} is waiting for payment. If you were charged, it will be confirmed automatically within a
+            few minutes.
+          </p>
+          <a [routerLink]="['/profile/orders', o.id]" class="btn">View order</a>
+        }
+      }
+      @case ("CANCELLED") {
+        <div class="result__icon result__icon--error" aria-hidden="true">×</div>
+        <h1>Payment cancelled</h1>
+        <p>You haven't been charged. Your cart is still saved, so you can try again whenever you're ready.</p>
+        <div class="result__actions">
+          <a routerLink="/checkout" class="btn">Try again</a>
+          <a routerLink="/cart" class="btn btn--secondary">Back to cart</a>
+        </div>
+      }
+      @default {
+        <div class="result__icon result__icon--success" aria-hidden="true">✓</div>
+        <h1>Thank you for your order!</h1>
+        <p>
+          Your payment of <strong>{{ o.totalAmount | number: "1.2-2" }} €</strong> was successful. Order #{{ o.id }} is
+          confirmed.
+        </p>
+        @if (o.cardLast4) {
+          <p class="result__card">Paid with {{ o.cardBrand }} •••• {{ o.cardLast4 }}</p>
+        }
+        <div class="result__actions">
+          <a [routerLink]="['/profile/orders', o.id]" class="btn">View order</a>
+          <a routerLink="/products" class="btn btn--secondary">Continue shopping</a>
+        </div>
+      }
+    }
+  } @else {
+    <div class="result__spinner" aria-hidden="true"></div>
+    <h1>Checking your payment...</h1>
+  }
+</div>

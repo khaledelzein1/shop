@@ -13,7 +13,10 @@
       <a routerLink="/cart" routerLinkActive="is-active" class="header__cart">
         Cart
         @if (cart.itemCount() > 0) {
-          <span class="header__badge">{{ cart.itemCount() }}</span>
+          <!-- keyed on the count so the badge bumps each time an item is added -->
+          @for (count of [cart.itemCount()]; track count) {
+            <span class="header__badge">{{ count }}</span>
+          }
         }
       </a>
 

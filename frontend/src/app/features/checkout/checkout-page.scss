@@ -9,10 +9,96 @@
   }
 }
 
+.checkout__main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
 .checkout__addresses h2,
+.checkout__payment h2,
 .checkout__summary h2 {
   margin-top: 0;
   font-size: 1.1rem;
+}
+
+.payment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  h2 {
+    margin-bottom: 0.75rem;
+  }
+
+  .checkout__cards {
+    margin-top: 0;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+  flex: 1;
+  min-width: 0;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+    background: #fff;
+
+    &:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    &.is-invalid {
+      border-color: #dc2626;
+    }
+  }
+}
+
+.field__with-icon {
+  position: relative;
+
+  input {
+    padding-right: 2.4rem;
+  }
+}
+
+.field__icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.field__error {
+  font-size: 0.8rem;
+  color: #dc2626;
+}
+
+.field-row {
+  display: flex;
+  gap: 1rem;
 }
 
 .address-option {
@@ -62,4 +148,48 @@
   text-align: center;
   margin-top: 0.75rem;
   margin-bottom: 0;
+}
+
+.checkout__note--test {
+  color: #92400e;
+  background: #fffbeb;
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+.checkout__pay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.checkout__cards {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.card-brand {
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #374151;
+  transition:
+    opacity 0.15s,
+    border-color 0.15s;
+}
+
+/* Dès que la marque est reconnue, les autres logos s'estompent. */
+.checkout__cards:has(.is-active) .card-brand:not(.is-active) {
+  opacity: 0.35;
+}
+
+.card-brand.is-active {
+  border-color: #2563eb;
+  color: #1d4ed8;
 }

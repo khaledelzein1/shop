@@ -36,12 +36,28 @@ public class AdminAccountInitializer implements CommandLineRunner {
   @Value("${app.seed.admin.email:admin@shop.local}")
   private String adminEmail;
 
+  @Value("${app.seed.admin.username:admin}")
+  private String adminUsername;
+
   @Value("${app.seed.admin.password:ChangeMe123!}")
   private String adminPassword;
 
   @Override
   public void run(String... args) {
-    if (!enabled || userRepository.existsByEmail(adminEmail)) {
+    if (!enabled) {
+      return;
+    }
+
+    // Compte déjà présent : on ne touche jamais aux identifiants que l'admin a pu choisir depuis
+    // son espace « Account » — on complète seulement le nom d'utilisateur s'il n'en a pas encore.
+    var existing = userRepository.findByEmail(adminEmail);
+    if (existing.isPresent()) {
+      User admin = existing.get();
+      if (admin.getUsername() == null
+          && userRepository.findByUsernameIgnoreCase(adminUsername).isEmpty()) {
+        admin.setUsername(adminUsername);
+        userRepository.save(admin);
+      }
       return;
     }
 
@@ -55,6 +71,7 @@ public class AdminAccountInitializer implements CommandLineRunner {
 
     User admin = new User();
     admin.setEmail(adminEmail);
+    admin.setUsername(adminUsername);
     admin.setPasswordHash(passwordEncoder.encode(adminPassword));
     admin.setFirstName("Admin");
     admin.setLastName("Shop");
@@ -62,8 +79,9 @@ public class AdminAccountInitializer implements CommandLineRunner {
     userRepository.save(admin);
 
     log.warn(
-        "Compte admin de démo créé : {} / (mot de passe défini via app.seed.admin.password) "
-            + "— à désactiver ou changer en dehors du dev local.",
+        "Compte admin de démo créé : {} ({}) / (mot de passe défini via app.seed.admin.password) "
+            + "— à changer depuis Admin → Account en dehors du dev local.",
+        adminUsername,
         adminEmail);
   }
 }

@@ -1,6 +1,7 @@
 export interface User {
   id: number;
   email: string;
+  username: string | null;
   firstName: string;
   lastName: string;
   roles: string[];
@@ -22,8 +23,16 @@ export interface RegisterPayload {
 }
 
 export interface LoginPayload {
-  email: string;
+  /** Email or username. */
+  login: string;
   password: string;
+}
+
+export interface UpdateAccountPayload {
+  currentPassword: string;
+  username: string;
+  /** null = keep the current password. */
+  newPassword: string | null;
 }
 
 export interface AdminUser {

@@ -1,20 +1,28 @@
 <h1>Dashboard</h1>
 
-<div class="dashboard-links">
-  <a routerLink="/admin/products" class="card dashboard-link">
-    <h3>Products</h3>
-    <p>Create, edit, manage variants and stock</p>
+<div class="dashboard-links anim-stagger">
+  <a routerLink="/admin/sales" class="card dashboard-link" style="--i: 0">
+    <h3>Sales</h3>
+    <p>Revenue, best sellers and latest sales</p>
   </a>
-  <a routerLink="/admin/categories" class="card dashboard-link">
+  <a routerLink="/admin/products" class="card dashboard-link" style="--i: 1">
+    <h3>Products</h3>
+    <p>Add, edit or remove products, variants and stock</p>
+  </a>
+  <a routerLink="/admin/categories" class="card dashboard-link" style="--i: 2">
     <h3>Categories</h3>
     <p>Organize the catalog</p>
   </a>
-  <a routerLink="/admin/orders" class="card dashboard-link">
+  <a routerLink="/admin/orders" class="card dashboard-link" style="--i: 3">
     <h3>Orders</h3>
     <p>Track and update order status</p>
   </a>
-  <a routerLink="/admin/users" class="card dashboard-link">
+  <a routerLink="/admin/users" class="card dashboard-link" style="--i: 4">
     <h3>Users</h3>
     <p>Enable / disable accounts</p>
+  </a>
+  <a routerLink="/admin/account" class="card dashboard-link" style="--i: 5">
+    <h3>Account</h3>
+    <p>Change your username and password</p>
   </a>
 </div>

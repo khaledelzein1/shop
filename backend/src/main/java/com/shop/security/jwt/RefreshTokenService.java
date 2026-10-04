@@ -61,6 +61,12 @@ public class RefreshTokenService {
     refreshTokenRepository.findByTokenHash(hash(rawToken)).ifPresent(rt -> rt.setRevoked(true));
   }
 
+  /** Déconnecte toutes les sessions de l'utilisateur (ex. après un changement de mot de passe). */
+  @Transactional
+  public void revokeAll(User user) {
+    refreshTokenRepository.revokeAllForUser(user.getId());
+  }
+
   private String generateOpaqueToken() {
     byte[] bytes = new byte[32];
     SECURE_RANDOM.nextBytes(bytes);

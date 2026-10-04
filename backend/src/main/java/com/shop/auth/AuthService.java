@@ -62,11 +62,11 @@ public class AuthService {
   @Transactional
   public AuthResponse login(LoginRequest request) {
     authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        new UsernamePasswordAuthenticationToken(request.login(), request.password()));
 
     User user =
         userRepository
-            .findByEmail(request.email())
+            .findByLogin(request.login())
             .orElseThrow(
                 () -> new IllegalStateException("Authenticated user not found in database"));
 
@@ -86,6 +86,15 @@ public class AuthService {
   @Transactional
   public void logout(String rawRefreshToken) {
     refreshTokenService.revoke(rawRefreshToken);
+  }
+
+  /**
+   * Nouveau couple access/refresh pour un utilisateur déjà authentifié (ex. après changement de mot
+   * de passe).
+   */
+  @Transactional
+  public AuthResponse issueTokens(User user) {
+    return buildAuthResponse(user);
   }
 
   private AuthResponse buildAuthResponse(User user) {

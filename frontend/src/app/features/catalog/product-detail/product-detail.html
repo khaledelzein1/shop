@@ -4,17 +4,19 @@
   @if (modelGroups(); as models) {
     @if (models.length > 1) {
       <div class="model-catalog">
-        <a routerLink="/products" class="back-link">← Back to catalog</a>
-        <p class="product-detail__brand">{{ p.brand }} · {{ p.category.name }}</p>
-        <h1>{{ p.name }}</h1>
-        <p class="product-detail__description">{{ p.description }}</p>
+        <div class="anim-fade-up">
+          <a routerLink="/products" class="back-link">← Back to catalog</a>
+          <p class="product-detail__brand">{{ p.brand }} · {{ p.category.name }}</p>
+          <h1>{{ p.name }}</h1>
+          <p class="product-detail__description">{{ p.description }}</p>
+        </div>
 
         @if (fitGroups().length > 1) {
           @if (selectedFit() === null) {
-            <div class="fit-tiles">
-              @for (fitGroup of fitGroups(); track fitGroup.fit) {
+            <div class="fit-tiles anim-stagger">
+              @for (fitGroup of fitGroups(); track fitGroup.fit; let i = $index) {
                 @let tileImage = fitTileImage(fitGroup.fit, fitGroup.models);
-                <button type="button" class="fit-tile" (click)="selectFit(fitGroup.fit)">
+                <button type="button" class="fit-tile" [style.--i]="i" (click)="selectFit(fitGroup.fit)">
                   <div class="fit-tile__photo">
                     @if (tileImage) {
                       <img [src]="tileImage.url" [alt]="fitGroup.fit" />
@@ -22,36 +24,42 @@
                       <img src="https://placehold.co/400x400?text=Shop" [alt]="fitGroup.fit" />
                     }
                   </div>
-                  <span class="fit-tile__name">{{ fitGroup.fit }}</span>
+                  <span class="fit-tile__name">
+                    {{ fitGroup.fit }}
+                    <span class="fit-tile__arrow" aria-hidden="true">→</span>
+                  </span>
                   <span class="fit-tile__count">{{ fitGroup.models.length }} styles</span>
                 </button>
               }
             </div>
           } @else {
-            <button type="button" class="back-link fit-back" (click)="backToFits()">← All fits</button>
-            <h2 class="fit-heading">{{ selectedFit() }}</h2>
-            <div class="model-grid">
-              @for (group of activeFitModels(); track group.name) {
-                <ng-container *ngTemplateOutlet="modelCard; context: { $implicit: group }" />
+            <button type="button" class="back-link fit-back anim-fade-up" (click)="backToFits()">← All fits</button>
+            <h2 class="fit-heading anim-fade-up">{{ selectedFit() }}</h2>
+            <div class="model-grid anim-stagger">
+              @for (group of activeFitModels(); track group.name; let i = $index) {
+                <ng-container *ngTemplateOutlet="modelCard; context: { $implicit: group, index: i }" />
               }
             </div>
           }
         } @else {
-          <div class="model-grid">
-            @for (group of displayedModelGroups(); track group.name) {
-              <ng-container *ngTemplateOutlet="modelCard; context: { $implicit: group }" />
+          <div class="model-grid anim-stagger">
+            @for (group of displayedModelGroups(); track group.name; let i = $index) {
+              <ng-container *ngTemplateOutlet="modelCard; context: { $implicit: group, index: i }" />
             }
           </div>
         }
 
-        <ng-template #modelCard let-group>
+        <ng-template #modelCard let-group let-index="index">
           @let variant = cardVariant(group.name, group.variants);
           @let image = cardImage(group.name, variant);
           @let images = cardImages(variant);
-          <div class="model-card">
+          <div class="model-card" [style.--i]="index">
             <div class="model-card__photo">
               @if (image) {
-                <img [src]="image.url" [alt]="group.name" />
+                <!-- keyed on the URL so a new photo (color/dot change) re-enters with a fade -->
+                @for (url of [image.url]; track url) {
+                  <img [src]="url" [alt]="group.name" />
+                }
               } @else {
                 <img src="https://placehold.co/400x400?text=Shop" [alt]="group.name" />
               }
@@ -121,6 +129,10 @@
                     [class.swatch--green]="v.attributes['color'] === 'Green'"
                     [class.swatch--beige]="v.attributes['color'] === 'Beige'"
                     [class.swatch--blue-gray]="v.attributes['color'] === 'Blue Gray'"
+                    [class.swatch--navy-blue]="v.attributes['color'] === 'Navy Blue'"
+                    [class.swatch--sky-blue]="v.attributes['color'] === 'Sky Blue'"
+                    [class.swatch--mint]="v.attributes['color'] === 'Mint'"
+                    [class.swatch--grey]="v.attributes['color'] === 'Grey'"
                     [class.is-selected]="variant?.attributes?.['color'] === v.attributes['color']"
                     [disabled]="!colorInStock(group.variants, v.attributes['color'])"
                     [attr.aria-label]="v.attributes['color']"
@@ -137,16 +149,18 @@
         </ng-template>
       </div>
     } @else {
-      <div class="product-detail">
+      <div class="product-detail anim-stagger">
         <div class="product-detail__gallery">
           @if (displayedImage(); as image) {
-            <img [src]="image.url" [alt]="p.name" />
+            @for (url of [image.url]; track url) {
+              <img [src]="url" [alt]="p.name" />
+            }
           } @else {
             <img src="https://placehold.co/500x500?text=Shop" [alt]="p.name" />
           }
         </div>
 
-        <div class="product-detail__info">
+        <div class="product-detail__info" style="--i: 1">
           <a routerLink="/products" class="back-link">← Back to catalog</a>
           <p class="product-detail__brand">{{ p.brand }} · {{ p.category.name }}</p>
           <h1>{{ p.name }}</h1>

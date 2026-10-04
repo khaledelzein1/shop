@@ -43,8 +43,29 @@ cd frontend && npm install && npx ng serve
 
 - API : http://localhost:8080 (Swagger UI : `/swagger-ui.html`)
 - Frontend : http://localhost:4200
-- Compte admin de démo créé automatiquement : `admin@shop.local` /
-  `ChangeMe123!` (dev uniquement — voir `SEED_ADMIN_ENABLED`)
+- Compte admin de démo créé automatiquement : identifiant `admin` (ou
+  `admin@shop.local`) / `ChangeMe123!` (dev uniquement — voir `SEED_ADMIN_ENABLED`).
+  L'admin choisit ensuite son propre nom d'utilisateur et mot de passe dans
+  **Admin → Account** ; le seeder ne les écrase jamais.
+
+### Paiement par carte (Stripe)
+
+Le checkout redirige vers la page de paiement hébergée par Stripe. Il faut
+une clé secrète **de test** (Dashboard Stripe → Developers → API keys,
+`sk_test_...`), passée au backend par variable d'environnement
+`STRIPE_SECRET_KEY` ou dans `backend/application-local.yml` (ignoré par
+git) — jamais dans le code :
+
+```yaml
+# backend/application-local.yml
+app:
+  stripe:
+    secret-key: sk_test_...
+```
+
+Sans clé, le checkout répond 503. Pour payer en test : carte
+`4242 4242 4242 4242`, date d'expiration future, CVC quelconque
+(`4000 0025 0000 3155` déclenche la validation 3-D Secure).
 
 Pour tester la pile complète conteneurisée (proche prod), voir
 [docker/README.md](docker/README.md).

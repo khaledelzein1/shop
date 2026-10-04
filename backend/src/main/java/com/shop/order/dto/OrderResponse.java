@@ -12,7 +12,9 @@ public record OrderResponse(
     BigDecimal totalAmount,
     Instant createdAt,
     List<OrderItemResponse> items,
-    ShippingAddressResponse shippingAddress) {
+    ShippingAddressResponse shippingAddress,
+    String cardBrand,
+    String cardLast4) {
 
   public static OrderResponse from(Order order) {
     return new OrderResponse(
@@ -21,6 +23,8 @@ public record OrderResponse(
         order.getTotalAmount(),
         order.getCreatedAt(),
         order.getItems().stream().map(OrderItemResponse::from).toList(),
-        ShippingAddressResponse.from(order));
+        ShippingAddressResponse.from(order),
+        order.getCardBrand(),
+        order.getCardLast4());
   }
 }

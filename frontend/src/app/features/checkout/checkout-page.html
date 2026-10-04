@@ -11,23 +11,122 @@
   </p>
 } @else {
   <div class="checkout">
-    <div class="checkout__addresses card">
-      <h2>Shipping address</h2>
-      @for (address of addresses(); track address.id) {
-        <label class="address-option">
-          <input
-            type="radio"
-            name="address"
-            [checked]="selectedAddressId() === address.id"
-            (change)="selectedAddressId.set(address.id)"
-          />
-          <span>
-            <strong>{{ address.label || "Address" }}</strong><br />
-            {{ address.street }}, {{ address.zipCode }} {{ address.city }}, {{ address.country }}
-          </span>
-        </label>
+    <div class="checkout__main">
+      <div class="checkout__addresses card">
+        <h2>Shipping address</h2>
+        @for (address of addresses(); track address.id) {
+          <label class="address-option">
+            <input
+              type="radio"
+              name="address"
+              [checked]="selectedAddressId() === address.id"
+              (change)="selectedAddressId.set(address.id)"
+            />
+            <span>
+              <strong>{{ address.label || "Address" }}</strong><br />
+              {{ address.street }}, {{ address.zipCode }} {{ address.city }}, {{ address.country }}
+            </span>
+          </label>
+        }
+        <a routerLink="/profile/addresses" class="checkout__manage-link">Manage my addresses</a>
+      </div>
+
+      @if (provider() === "DEMO") {
+        <!-- <form> pour que le navigateur propose l'autoremplissage des cartes enregistrées. -->
+        <form class="checkout__payment card" novalidate (submit)="$event.preventDefault(); pay()">
+          <div class="payment-header">
+            <h2>Payment</h2>
+            <div class="checkout__cards" aria-label="Accepted cards">
+              <span class="card-brand" [class.is-active]="brand() === 'visa'">VISA</span>
+              <span class="card-brand" [class.is-active]="brand() === 'mastercard'">Mastercard</span>
+              <span class="card-brand" [class.is-active]="brand() === 'amex'">AMEX</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="cc-name">Name on card</label>
+            <input
+              id="cc-name"
+              type="text"
+              autocomplete="cc-name"
+              placeholder="Jane Doe"
+              [value]="holderName()"
+              [class.is-invalid]="showErrors() && cardErrors().holderName"
+              (input)="onHolderNameInput($event)"
+            />
+            @if (showErrors() && cardErrors().holderName) {
+              <span class="field__error">{{ cardErrors().holderName }}</span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="cc-number">Card number</label>
+            <div class="field__with-icon">
+              <input
+                id="cc-number"
+                type="text"
+                inputmode="numeric"
+                autocomplete="cc-number"
+                placeholder="1234 1234 1234 1234"
+                [value]="cardNumber()"
+                [class.is-invalid]="showErrors() && cardErrors().number"
+                (input)="onCardNumberInput($event)"
+              />
+              <svg class="field__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"
+                />
+              </svg>
+            </div>
+            @if (showErrors() && cardErrors().number) {
+              <span class="field__error">{{ cardErrors().number }}</span>
+            }
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="cc-exp">Expiry date</label>
+              <input
+                id="cc-exp"
+                type="text"
+                inputmode="numeric"
+                autocomplete="cc-exp"
+                placeholder="MM / YY"
+                [value]="expiry()"
+                [class.is-invalid]="showErrors() && cardErrors().expiry"
+                (input)="onExpiryInput($event)"
+              />
+              @if (showErrors() && cardErrors().expiry) {
+                <span class="field__error">{{ cardErrors().expiry }}</span>
+              }
+            </div>
+            <div class="field">
+              <label for="cc-cvc">Security code</label>
+              <input
+                id="cc-cvc"
+                type="password"
+                inputmode="numeric"
+                autocomplete="cc-csc"
+                [placeholder]="cvcMaxLength() === 4 ? 'CVV' : 'CVC'"
+                [value]="cvc()"
+                [class.is-invalid]="showErrors() && cardErrors().cvc"
+                (input)="onCvcInput($event)"
+              />
+              @if (showErrors() && cardErrors().cvc) {
+                <span class="field__error">{{ cardErrors().cvc }}</span>
+              }
+            </div>
+          </div>
+
+          @if (!production) {
+            <p class="checkout__note checkout__note--test">
+              Demo mode — no real money is charged. Approved: <strong>4242 4242 4242 4242</strong>. Declined:
+              <strong>4000 0000 0000 0002</strong>. Any future date and any CVC.
+            </p>
+          }
+        </form>
       }
-      <a routerLink="/profile/addresses" class="checkout__manage-link">Manage my addresses</a>
     </div>
 
     <div class="checkout__summary card">
@@ -47,10 +146,50 @@
         <div class="alert alert--error">{{ errorMessage() }}</div>
       }
 
-      <button type="button" class="btn" [disabled]="submitting()" (click)="confirm()">
-        {{ submitting() ? "Confirming..." : "Confirm order" }}
+      <button
+        type="button"
+        class="btn checkout__pay"
+        [disabled]="submitting() || !provider()"
+        (click)="pay()"
+      >
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 0 1 6 0v3H9z"
+          />
+        </svg>
+        @if (submitting()) {
+          {{ provider() === "STRIPE" ? "Redirecting to payment..." : "Processing payment..." }}
+        } @else {
+          Pay {{ cart().totalAmount | number: "1.2-2" }} €
+        }
       </button>
-      <p class="checkout__note">Simulated payment — no card details are requested.</p>
+
+      @if (provider() === "STRIPE") {
+        <div class="checkout__cards" aria-label="Accepted cards">
+          <span class="card-brand">VISA</span>
+          <span class="card-brand">Mastercard</span>
+          <span class="card-brand">AMEX</span>
+        </div>
+        <p class="checkout__note">
+          You'll enter your card details on Stripe's secure payment page. Your card number is never stored by the shop.
+        </p>
+        @if (!production) {
+          <p class="checkout__note checkout__note--test">
+            Test mode: pay with card <strong>4242 4242 4242 4242</strong>, any future expiry date and any CVC.
+          </p>
+        }
+      } @else {
+        <p class="checkout__note">
+          <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 0 1 6 0v3H9z"
+            />
+          </svg>
+          Your full card number and security code are never stored.
+        </p>
+      }
     </div>
   </div>
 }

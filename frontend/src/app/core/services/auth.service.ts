@@ -81,6 +81,11 @@ export class AuthService {
     return localStorage.getItem(REFRESH_TOKEN_KEY);
   }
 
+  /** Replaces the stored session (e.g. with the fresh tokens returned after a credentials change). */
+  applySession(res: AuthResponse): void {
+    this.handleAuthSuccess(res);
+  }
+
   private handleAuthSuccess(res: AuthResponse): void {
     localStorage.setItem(TOKEN_KEY, res.accessToken);
     localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken);

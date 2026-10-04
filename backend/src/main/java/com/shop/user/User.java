@@ -24,6 +24,13 @@ public class User extends BaseEntity {
   @Column(nullable = false, unique = true)
   private String email;
 
+  /**
+   * Identifiant de connexion alternatif à l'email (optionnel, unique sans tenir compte de la
+   * casse).
+   */
+  @Column(length = 30)
+  private String username;
+
   @Column(name = "password_hash", nullable = false)
   private String passwordHash;
 
