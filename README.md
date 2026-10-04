@@ -1,60 +1,99 @@
-# Shop — Plateforme e-commerce multi-catégories
+# Shop — full-stack e-commerce platform
 
-Projet portfolio fullstack : vente de matériel informatique et de vêtements.
-Monolithe modulaire Spring Boot + Angular, pensé pour être proche d'un vrai
-contexte d'entreprise (architecture, sécurité, tests, CI/CD, observabilité).
+A complete online clothing and shoe store, built as a portfolio project to be
+close to a real company codebase: a modular Spring Boot monolith, an Angular
+front end, card payments, an admin back office, automated tests and CI.
 
-## Stack
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)
+![Java](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3-6DB33F?logo=springboot&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Flyway-4169E1?logo=postgresql&logoColor=white)
 
-| Domaine     | Techno                                  |
-|-------------|------------------------------------------|
-| Backend     | Java 21, Spring Boot, Spring Security, JWT |
-| Frontend    | Angular                                  |
-| Base de données | PostgreSQL, Flyway (migrations)     |
-| DevOps      | Docker, Docker Compose, GitHub Actions   |
-| Qualité     | JUnit 5, Testcontainers, Jacoco, ESLint  |
-| Doc API     | OpenAPI / Swagger UI                     |
+## Features
 
-## Structure du repo
+**Storefront**
+- Catalog by category (T-shirts, jackets, pants, shoes) with full-text search and filters
+- Product pages grouped by fit (Short Sleeve, Puffer, Leather…), with color swatches,
+  photo galleries per color and a quick size picker
+- "Find my size" helper
+- Cart, checkout with saved addresses, and order history
+- Smooth animations: page transitions, staggered entrances and hover effects
+  (disabled automatically for users who prefer reduced motion)
+
+**Payments**
+- **Stripe Checkout** (hosted payment page, 3-D Secure) when a Stripe key is configured
+- Otherwise a built-in **demo card processor** that runs the same checks (Luhn, expiry,
+  CVC) without charging anything, so the project works out of the box
+- A scheduled job reconciles payments that were left pending
+
+**Admin back office** (`/admin`)
+- **Sales dashboard**: revenue, orders, average order value, items sold, revenue per day,
+  best sellers and latest sales, over 7 days to 12 months
+- **Products**: create, edit and delete products, variants, stock and photos
+- **Categories**, **orders** (status workflow with stock restored on cancellation)
+  and **users** (enable / disable accounts)
+- **Account**: the admin chooses their own username and password
+
+**Security & engineering**
+- JWT access tokens with rotating refresh tokens; login with email or username
+- Role-based access (customer / admin), rate limiting on login and sign-up
+- Database schema and catalog data versioned with Flyway migrations
+- Caching (Caffeine), OpenAPI / Swagger UI, Actuator metrics
+- Tests: JUnit 5 + Mockito unit tests, Testcontainers integration tests, front-end unit tests
+- Lint & format: Spotless (Google Java Format), ESLint
+- CI on every push: back-end build & tests, front-end lint/tests/build, Docker image builds
+
+## Tech stack
+
+| Area      | Technologies                                       |
+|-----------|----------------------------------------------------|
+| Back end  | Java 21, Spring Boot 3.3, Spring Security, JWT     |
+| Front end | Angular 22, TypeScript, SCSS                       |
+| Database  | PostgreSQL, Flyway                                 |
+| Payments  | Stripe Checkout                                    |
+| DevOps    | Docker, Docker Compose, nginx, GitHub Actions      |
+| Quality   | JUnit 5, Mockito, Testcontainers, Spotless, ESLint |
+| API docs  | OpenAPI / Swagger UI                               |
+
+## Project structure
 
 ```
 shop/
-├── backend/    # API Spring Boot (monolithe modulaire)
-├── frontend/   # Application Angular
-├── docs/       # Décisions d'architecture, modèle de domaine, roadmap
-└── docker/     # docker-compose, fichiers d'infra locale
+├── backend/    # Spring Boot API (modular monolith: catalog, cart, order, payment, user, auth…)
+├── frontend/   # Angular application (storefront + admin)
+├── docker/     # docker-compose files (dev database, full containerized stack)
+└── docs/       # Architecture decisions, domain model, roadmap
 ```
 
-## Démarrage rapide
+## Getting started
 
-Prérequis : **JDK 21** (exactement — voir `docs/ARCHITECTURE.md` §0),
-**Node 22+**, Docker Desktop.
+**Prerequisites:** JDK 21 (exactly, see `docs/ARCHITECTURE.md` §0), Node 22+, Docker Desktop.
 
 ```bash
-# 1. Base de données locale
+# 1. Start the database
 cd docker && docker compose up -d
 
-# 2. Backend (terminal séparé)
+# 2. Start the back end (separate terminal)
 cd backend && mvn spring-boot:run
 
-# 3. Frontend (terminal séparé)
+# 3. Start the front end (separate terminal)
 cd frontend && npm install && npx ng serve
 ```
 
-- API : http://localhost:8080 (Swagger UI : `/swagger-ui.html`)
-- Frontend : http://localhost:4200
-- Compte admin de démo créé automatiquement : identifiant `admin` (ou
-  `admin@shop.local`) / `ChangeMe123!` (dev uniquement — voir `SEED_ADMIN_ENABLED`).
-  L'admin choisit ensuite son propre nom d'utilisateur et mot de passe dans
-  **Admin → Account** ; le seeder ne les écrase jamais.
+- Website: http://localhost:4200
+- API: http://localhost:8080 (Swagger UI at `/swagger-ui.html`)
+- Demo admin account, created automatically in development: username `admin`
+  (or `admin@shop.local`), password `ChangeMe123!`. Change it from **Admin → Account**.
+  The account is only created when `SEED_ADMIN_ENABLED` is true, and existing credentials
+  are never overwritten.
 
-### Paiement par carte (Stripe)
+### Card payments
 
-Le checkout redirige vers la page de paiement hébergée par Stripe. Il faut
-une clé secrète **de test** (Dashboard Stripe → Developers → API keys,
-`sk_test_...`), passée au backend par variable d'environnement
-`STRIPE_SECRET_KEY` ou dans `backend/application-local.yml` (ignoré par
-git) — jamais dans le code :
+Without any configuration, checkout uses the demo card processor. To use Stripe instead,
+get a **test** secret key (Stripe Dashboard → Developers → API keys, `sk_test_...`) and pass
+it through the `STRIPE_SECRET_KEY` environment variable, or put it in
+`backend/application-local.yml` (git-ignored). Never put it in the code:
 
 ```yaml
 # backend/application-local.yml
@@ -63,28 +102,41 @@ app:
     secret-key: sk_test_...
 ```
 
-Sans clé, le checkout répond 503. Pour payer en test : carte
-`4242 4242 4242 4242`, date d'expiration future, CVC quelconque
-(`4000 0025 0000 3155` déclenche la validation 3-D Secure).
+Test cards (they behave the same in demo mode and with Stripe):
 
-Pour tester la pile complète conteneurisée (proche prod), voir
-[docker/README.md](docker/README.md).
+| Card number           | Result                          |
+|-----------------------|---------------------------------|
+| `4242 4242 4242 4242` | Payment accepted                |
+| `4000 0025 0000 3155` | Asks for 3-D Secure (Stripe)    |
+| `4000 0000 0000 0002` | Declined                        |
+| `4000 0000 0000 9995` | Declined: insufficient funds    |
+
+Use any future expiry date and any CVC.
+
+### Full containerized stack
+
+To run PostgreSQL, the back end and the front end (served by nginx) in containers,
+close to a production setup, see [docker/README.md](docker/README.md).
+
+## Running the tests
+
+```bash
+cd backend && mvn verify          # unit + integration tests (Docker required for Testcontainers)
+cd frontend && npx ng test        # front-end unit tests
+cd frontend && npx eslint src     # lint
+```
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md) — décisions techniques et découpage backend
-- [Modèle de domaine](docs/DOMAIN_MODEL.md) — entités, relations, MVP vs V2
-- [Roadmap](docs/ROADMAP.md) — étapes de construction du projet
-- [docker/README.md](docker/README.md) — dev vs pile complète conteneurisée
+The design documents are written in French:
 
-## État du projet
+- [Architecture](docs/ARCHITECTURE.md): technical decisions and back-end modules
+- [Domain model](docs/DOMAIN_MODEL.md): entities, relations, MVP vs V2
+- [Roadmap](docs/ROADMAP.md): how the project was built, step by step, and the trade-offs made
 
-✅ **MVP complet** (étapes 0 à 10 de la [roadmap](docs/ROADMAP.md)) : auth JWT
-avec refresh token, catalogue avec recherche full-text, panier, checkout,
-espace admin complet, DevOps (Docker/CI), observabilité, tests, lint, rate
-limiting, cache. Voir la [roadmap](docs/ROADMAP.md) pour le détail de
-chaque étape et les compromis assumés.
+## Status
 
-Reste : déploiement cloud (nécessite un choix de service externe), le
-repo n'est pas encore poussé sur GitHub, et les fonctionnalités V2
-(wishlist, avis produits, promotions).
+The MVP is complete: authentication, catalog and search, cart, checkout and payments,
+admin back office with sales reporting, Docker, CI, observability and tests.
+
+Next steps: cloud deployment, and V2 features (wishlist, product reviews, promotions).
